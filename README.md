@@ -1,4 +1,4 @@
-# ひかげみち (Hikage Michi)
+# ひかげナビ (Hikage Navi)
 
 A Japanese-first, mobile-first web app for comparing journeys in Japan by **outdoor time, potential direct sunlight, estimated shade, weather, UV and official heat-index (WBGT) forecasts**.
 

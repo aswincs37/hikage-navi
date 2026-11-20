@@ -18,7 +18,7 @@ function AboutJa({ promise }: { promise: string }) {
       <p>{promise}</p>
       <p>
         夏の日本では、同じ目的地でも、どの道を通るか・何時に出るかで、炎天下にいる時間が大きく変わります。
-        ひかげみちは、経路ごとの「屋外にいる時間」「日差しを受ける可能性」「日陰」と、予想気温・紫外線・暑さ指数を並べて比べられるようにするサービスです。
+        ひかげナビは、経路ごとの「屋外にいる時間」「日差しを受ける可能性」「日陰」と、予想気温・紫外線・暑さ指数を並べて比べられるようにするサービスです。
       </p>
       <h2>大切にしていること</h2>
       <ul>
@@ -44,7 +44,7 @@ function AboutEn({ promise }: { promise: string }) {
       <p>{promise}</p>
       <p>
         In a Japanese summer, the time you spend in the blazing sun can vary a lot depending on which way you go and when you leave, even to the same destination.
-        Hikage Michi lets you compare each route side by side: time outdoors, chance of direct sun, shade, and the forecast temperature, UV and heat index.
+        Hikage Navi lets you compare each route side by side: time outdoors, chance of direct sun, shade, and the forecast temperature, UV and heat index.
       </p>
       <h2>What we care about</h2>
       <ul>

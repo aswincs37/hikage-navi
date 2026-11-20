@@ -47,7 +47,7 @@ describe("production readiness", () => {
   it("builds the User-Agent from SITE_URL", () => {
     vi.stubEnv("HTTP_USER_AGENT", "");
     vi.stubEnv("SITE_URL", "https://hikage.example/");
-    expect(getConfig().userAgent).toBe("hikage-michi/1.0 (+https://hikage.example)");
+    expect(getConfig().userAgent).toBe("hikage-navi/1.0 (+https://hikage.example)");
   });
 });
 

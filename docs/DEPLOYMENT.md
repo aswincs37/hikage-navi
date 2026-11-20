@@ -21,7 +21,7 @@ Serve over HTTPS behind the platform or a reverse proxy. Node 20.9+ (CI uses 22)
 | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `RATE_LIMIT_SALT` | Recommended | Shared rate limit across instances (serverless). Falls back to per-instance counting. |
 
 ### Check the setup
-- On start, the server logs `[hikage-michi] readiness ...` lines for anything missing (or `readiness: OK`).
+- On start, the server logs `[hikage-navi] readiness ...` lines for anything missing (or `readiness: OK`).
 - `GET /api/v1/providers/status` returns the same list as `readiness` (codes only, no URLs or keys). Empty list = ready.
 
 ## What production mode adds

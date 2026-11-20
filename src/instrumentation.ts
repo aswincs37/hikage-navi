@@ -9,11 +9,11 @@ export async function register() {
   const { readinessIssues } = await import("@/lib/config/readiness");
   const issues = readinessIssues();
   if (issues.length === 0) {
-    console.info("[hikage-michi] production readiness: OK");
+    console.info("[hikage-navi] production readiness: OK");
     return;
   }
   for (const i of issues) {
-    const line = `[hikage-michi] readiness ${i.level.toUpperCase()} ${i.code}: ${i.message}`;
+    const line = `[hikage-navi] readiness ${i.level.toUpperCase()} ${i.code}: ${i.message}`;
     if (i.level === "error") console.error(line);
     else console.warn(line);
   }
@@ -31,5 +31,5 @@ export async function onRequestError(
   const name = err instanceof Error ? err.name : "unknown";
   const digest = typeof err === "object" && err !== null && "digest" in err ? String((err as { digest: unknown }).digest) : undefined;
   const path = request.path.split("?")[0];
-  console.error(`[hikage-michi] request error ${request.method} ${path} (${context.routeType} ${context.routePath}) ${name}${digest ? ` digest=${digest}` : ""}`);
+  console.error(`[hikage-navi] request error ${request.method} ${path} (${context.routeType} ${context.routePath}) ${name}${digest ? ` digest=${digest}` : ""}`);
 }

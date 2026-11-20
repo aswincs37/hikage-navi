@@ -1,4 +1,4 @@
-/** ひかげみちのロゴ: 太陽の下、建物の影に沿って涼しく伸びる道 */
+/** ひかげナビのロゴ: 太陽の下、建物の影に沿って涼しく伸びる道 */
 export function LogoMark({ className = "h-8 w-8" }: { className?: string }) {
   return (
     <svg viewBox="0 0 40 40" className={className} aria-hidden="true" focusable="false">

@@ -119,7 +119,7 @@ function userAgent(): string {
   const explicit = env("HTTP_USER_AGENT");
   if (explicit) return explicit;
   const site = env("SITE_URL");
-  return site ? `hikage-michi/1.0 (+${site.replace(/\/+$/, "")})` : "hikage-michi/0.1 (development)";
+  return site ? `hikage-navi/1.0 (+${site.replace(/\/+$/, "")})` : "hikage-navi/0.1 (development)";
 }
 
 function transitConfig() {

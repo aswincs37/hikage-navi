@@ -19,7 +19,7 @@ const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace
 const TILE_DIR = path.join(ROOT, ".cache", "rail-tiles");
 const OUT = path.join(ROOT, "data", "rail", "japan-rail.json.gz");
 const OVERPASS = process.env.OVERPASS_URL || "https://overpass-api.de/api/interpreter";
-const UA = process.env.HTTP_USER_AGENT || "hikage-michi-rail-build/0.1";
+const UA = process.env.HTTP_USER_AGENT || "hikage-navi-rail-build/0.1";
 const args = new Set(process.argv.slice(2));
 
 /** 日本の陸地をおおまかに覆う範囲（緯度 from-to, 経度 from-to）。この範囲に掛かる 1° タイルだけを取得する */

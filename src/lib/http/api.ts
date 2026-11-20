@@ -59,7 +59,7 @@ export function clientKey(req: NextRequest): string {
 /** IP アドレスをそのまま外部に送らないためのハッシュ（RATE_LIMIT_SALT で推測しにくくする） */
 function hashedClient(req: NextRequest): string {
   return createHash("sha256")
-    .update(`${process.env.RATE_LIMIT_SALT ?? "hikage-michi"}:${clientKey(req)}`)
+    .update(`${process.env.RATE_LIMIT_SALT ?? "hikage-navi"}:${clientKey(req)}`)
     .digest("base64url")
     .slice(0, 22);
 }

@@ -4,7 +4,7 @@
  */
 export const ja = {
   brand: {
-    name: "ひかげみち",
+    name: "ひかげナビ",
     tagline: "日差しと暑さで選ぶ、移動のしかた",
     promise: "所要時間・日差し・日陰・屋外の快適さから、あなたに合った移動を選べます。",
     badge: "日陰ルート案内",
@@ -511,7 +511,7 @@ export const ja = {
     privacyBody: "検索内容や位置情報をサーバーに保存しません。現在地はボタンを押したときだけ使います。",
     heroAccent: "日陰と快適さで選ぶ、新しいルート案内。",
     highlights: ["建物3D日陰推定", "太陽方位・車窓日差し", "環境省暑さ指数(WBGT)"],
-    featuresTitle: "ひかげみちの特徴",
+    featuresTitle: "ひかげナビの特徴",
     featuresLead: "地図の形状と気象データから、透明性の高い計算で安全・快適な道をご提案します。",
     honestyTag: "データ方針",
     privacyTag: "安心設計",

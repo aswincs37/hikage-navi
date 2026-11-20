@@ -138,7 +138,7 @@ describe("最近の検索", () => {
     expect(again.map((t) => t.at)).toEqual([3, 2]);
     expect(parseRecent("not json")).toEqual([]);
     saveRecent({ lat: 35.123456, lon: 139.654321, label: "現在地" }, b, "car", true);
-    const raw = window.localStorage.getItem("hikage-michi:recent-trips")!;
+    const raw = window.localStorage.getItem("hikage-navi:recent-trips")!;
     expect(raw).not.toContain("35.123456");
     expect(parseRecent(raw)[0]).toMatchObject({ origin: null, destination: b });
     expect(parseRecent(JSON.stringify([{ origin: null, destination: { lat: "x" }, mode: "car" }]))).toEqual([]);
@@ -148,7 +148,7 @@ describe("最近の検索", () => {
 
   it("検索すると例の代わりに最近の検索を表示し、押すと入力される。現在地の座標は保存しない", async () => {
     window.localStorage.setItem(
-      "hikage-michi:recent-trips",
+      "hikage-navi:recent-trips",
       JSON.stringify([
         { origin: a, destination: b, mode: "car", at: 2 },
         { origin: null, destination: a, mode: "car", at: 1 },
@@ -162,12 +162,12 @@ describe("最近の検索", () => {
     expect(screen.getByLabelText(/車・バス/)).toBeChecked();
     fireEvent.click(screen.getByRole("button", { name: "日陰の席を探す" }));
     await waitFor(() => expect(push).toHaveBeenCalled());
-    const saved = parseRecent(window.localStorage.getItem("hikage-michi:recent-trips")!);
+    const saved = parseRecent(window.localStorage.getItem("hikage-navi:recent-trips")!);
     expect(saved[0]).toMatchObject({ origin: a, destination: b, mode: "car" });
 
     fireEvent.click(screen.getByRole("button", { name: "履歴を消す" }));
     expect(await screen.findByText("例から試す")).toBeInTheDocument();
-    expect(window.localStorage.getItem("hikage-michi:recent-trips")).toBeNull();
+    expect(window.localStorage.getItem("hikage-navi:recent-trips")).toBeNull();
   });
 });
 

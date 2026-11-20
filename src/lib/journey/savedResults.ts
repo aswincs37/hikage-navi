@@ -24,9 +24,9 @@ export interface SavedSummary {
   departure: string;
 }
 
-const KEY = "hikage-michi:saved-results";
+const KEY = "hikage-navi:saved-results";
 const MAX = 5;
-const EVENT = "hikage-michi:saved-change";
+const EVENT = "hikage-navi:saved-change";
 
 /** 「現在地」の表示名（日本語・英語）。この出発地の結果は端末に残さない */
 const CURRENT_LOCATION_LABELS = ["現在地", "Current location"];

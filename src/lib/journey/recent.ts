@@ -13,9 +13,9 @@ export interface RecentTrip {
   at: number;
 }
 
-const KEY = "hikage-michi:recent-trips";
+const KEY = "hikage-navi:recent-trips";
 const MAX = 6;
-const EVENT = "hikage-michi:recent-change";
+const EVENT = "hikage-navi:recent-change";
 
 const samePlace = (a: Place | null, b: Place | null) =>
   a === b || (!!a && !!b && Math.abs(a.lat - b.lat) < 1e-4 && Math.abs(a.lon - b.lon) < 1e-4);

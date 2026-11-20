@@ -3,7 +3,7 @@ import type { Messages } from "./ja";
 /** 英語の表示文言（ja.ts と同じ形。型で項目の漏れを検出する） */
 export const en: Messages = {
   brand: {
-    name: "Hikage Michi",
+    name: "Hikage Navi",
     tagline: "Choose how you travel by sun and heat",
     promise: "Compare travel time, sunlight, shade and outdoor comfort to find the journey that suits you.",
     badge: "Shade route guide",
@@ -513,7 +513,7 @@ export const en: Messages = {
     privacyBody: "Your searches and location are never stored on our servers. Your current location is used only when you press the button.",
     heroAccent: "Route guidance that puts shade and comfort first.",
     highlights: ["3D building shade estimates", "Sun direction & window side", "Official heat index (WBGT)"],
-    featuresTitle: "What Hikage Michi does",
+    featuresTitle: "What Hikage Navi does",
     featuresLead: "Using map geometry and weather data, we suggest safer, more comfortable routes with transparent calculations.",
     honestyTag: "Data policy",
     privacyTag: "Privacy first",

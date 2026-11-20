@@ -11,7 +11,7 @@ function env(name: string): string | undefined {
 }
 
 export interface SiteInfo {
-  /** 公開URL（例: https://hikage-michi.jp）。外部サービスへの User-Agent にも使う */
+  /** 公開URL（例: https://hikage-navi.jp）。外部サービスへの User-Agent にも使う */
   url?: string;
   /** 運営者名（個人名または法人名） */
   operatorName?: string;

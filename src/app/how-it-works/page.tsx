@@ -16,7 +16,7 @@ function HowItWorksJa() {
   return (
     <>
       <p>
-        ひかげみちは、経路・太陽の位置・建物・気象予報を組み合わせて、移動中の日差しや暑さを「推定」します。
+        ひかげナビは、経路・太陽の位置・建物・気象予報を組み合わせて、移動中の日差しや暑さを「推定」します。
         ここでは、それぞれの値がどのように計算され、どこに限界があるのかを説明します。
       </p>
 
@@ -103,7 +103,7 @@ function HowItWorksEn() {
   return (
     <>
       <p>
-        Hikage Michi combines routes, the sun&apos;s position, buildings and weather forecasts to <em>estimate</em> the sunlight and heat you&apos;ll meet on the way.
+        Hikage Navi combines routes, the sun&apos;s position, buildings and weather forecasts to <em>estimate</em> the sunlight and heat you&apos;ll meet on the way.
         This page explains how each value is calculated and where its limits are.
       </p>
 
