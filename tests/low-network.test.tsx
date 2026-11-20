@@ -1,5 +1,4 @@
 // @vitest-environment jsdom
-import { gunzipSync } from "node:zlib";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { fetchWithTimeout } from "@/lib/http/fetchWithTimeout";
@@ -63,24 +62,14 @@ describe("通信が遅い・止まったとき", () => {
   });
 });
 
-describe("API の応答の圧縮", () => {
-  const big = { items: Array.from({ length: 200 }, (_, i) => ({ i, name: "東京駅" })) };
-
-  it("ブラウザが gzip に対応していれば圧縮して返す", async () => {
-    const req = new Request("http://x/", { headers: { "accept-encoding": "gzip, deflate, br" } });
-    const res = apiOk(big, { req });
-    expect(res.headers.get("content-encoding")).toBe("gzip");
-    const buf = Buffer.from(await res.arrayBuffer());
-    expect(buf.length).toBeLessThan(JSON.stringify(big).length / 3);
-    expect(JSON.parse(gunzipSync(buf).toString())).toEqual(big);
-  });
-
-  it("対応していない・小さい応答はそのまま返す", async () => {
-    const plain = apiOk(big, { req: new Request("http://x/") });
-    expect(plain.headers.get("content-encoding")).toBeNull();
-    expect(await plain.json()).toEqual(big);
-    const small = apiOk({ ok: 1 }, { req: new Request("http://x/", { headers: { "accept-encoding": "gzip" } }) });
-    expect(small.headers.get("content-encoding")).toBeNull();
+describe("API の応答", () => {
+  it("自前では圧縮しない（サーバー側の圧縮と二重にならないように）", async () => {
+    const big = { items: Array.from({ length: 200 }, (_, i) => ({ i, name: "東京駅" })) };
+    const res = apiOk(big);
+    expect(res.headers.get("content-encoding")).toBeNull();
+    expect(res.headers.get("cache-control")).toBe("no-store");
+    expect(await res.json()).toEqual(big);
+    expect(apiOk({ ok: 1 }, { cacheSeconds: 60 }).headers.get("cache-control")).toBe("public, max-age=60");
   });
 });
 

@@ -19,7 +19,7 @@ const schema = z.object({
  * 各地点に、その時刻に最も近い予報値を対応付ける（出発地の現在値で代用しない）。
  */
 export async function POST(req: NextRequest) {
-  const limited = rateLimit(req, "calc");
+  const limited = await rateLimit(req, "calc");
   if (limited) return limited;
   const parsed = await readJsonBody(req);
   if (!parsed.ok) return parsed.res;
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       weather ? weather.forecast(query).catch((e) => (e instanceof ProviderError ? { error: e.kind } : Promise.reject(e))) : { error: "not_configured" },
       wbgt ? wbgt.forecast(query).catch((e) => (e instanceof ProviderError ? { error: e.kind } : Promise.reject(e))) : { error: "not_configured" },
     ]);
-    return apiOk({ weather: w, wbgt: h }, { req });
+    return apiOk({ weather: w, wbgt: h });
   } catch (e) {
     return internalError("weather/route", e);
   }

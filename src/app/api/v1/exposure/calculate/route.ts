@@ -15,7 +15,7 @@ export const maxDuration = 60;
  * 所要時間は距離に比例して各区間に配分する（実際の速度の変化は考慮しない）。
  */
 export async function POST(req: NextRequest) {
-  const limited = rateLimit(req, "calc");
+  const limited = await rateLimit(req, "calc");
   if (limited) return limited;
   const parsed = await readJsonBody(req);
   if (!parsed.ok) return parsed.res;

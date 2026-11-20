@@ -10,7 +10,7 @@ export const maxDuration = 60;
 
 /** POST /api/v1/journeys/search — 経路検索と日差し・気象・暑さ指数の評価 */
 export async function POST(req: NextRequest) {
-  const limited = rateLimit(req, "search");
+  const limited = await rateLimit(req, "search");
   if (limited) return limited;
   const parsed = await readJsonBody(req);
   if (!parsed.ok) return parsed.res;
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   if (!v.ok) return apiError(400, "invalid_request", v.issues);
   try {
     const result = await searchCache.getOrCreate(searchCacheKey(v.value), () => searchJourney(v.value, buildProviders()), worthKeeping);
-    return apiOk(result, { req });
+    return apiOk(result);
   } catch (e) {
     return internalError("journeys/search", e);
   }

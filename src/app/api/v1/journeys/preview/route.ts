@@ -22,7 +22,7 @@ const cache = new TtlCache<JourneyPreview | null>(500, ROAD_TTL_MS);
  * GET にすることで、ブラウザも同じ区間の結果を再利用できる。
  */
 export async function GET(req: NextRequest) {
-  const limited = rateLimit(req, "preview");
+  const limited = await rateLimit(req, "preview");
   if (limited) return limited;
   const q = req.nextUrl.searchParams;
   const num = (k: string) => {
@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
       cache.set(key, preview, road ? ROAD_TTL_MS : TRAIN_TTL_MS);
     }
     if (!preview) return apiError(404, "no_route");
-    return apiOk(preview, { req, cacheSeconds: road ? 86_400 : 3_600 });
+    return apiOk(preview, { cacheSeconds: road ? 86_400 : 3_600 });
   } catch (e) {
     return internalError("journeys/preview", e);
   }

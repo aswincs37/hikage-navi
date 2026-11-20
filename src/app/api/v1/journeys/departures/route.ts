@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   const times = validateDepartureTimes(body.times);
   if (!times.ok) return apiError(400, "invalid_request", times.issues);
   // 時刻の数だけ重く数える
-  const limited = rateLimit(req, "search", times.value.length);
+  const limited = await rateLimit(req, "search", times.value.length);
   if (limited) return limited;
   const v = validateJourneyRequest(body);
   if (!v.ok) return apiError(400, "invalid_request", v.issues);
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     const result = await compareDepartures(v.value, times.value, buildProviders());
     // 比較表には区間ごとの詳細は不要なので応答を小さくする
     for (const o of result.options) if (o.best) o.best = { ...o.best, segments: [] };
-    return apiOk(result, { req });
+    return apiOk(result);
   } catch (e) {
     return internalError("journeys/departures", e);
   }

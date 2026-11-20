@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 /** POST /api/v1/sun/position — 指定地点・日時の太陽位置（天文計算） */
 export async function POST(req: NextRequest) {
-  const limited = rateLimit(req, "calc");
+  const limited = await rateLimit(req, "calc");
   if (limited) return limited;
   const parsed = await readJsonBody(req);
   if (!parsed.ok) return parsed.res;

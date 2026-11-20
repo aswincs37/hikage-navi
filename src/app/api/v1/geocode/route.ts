@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
  */
 export async function GET(req: NextRequest) {
   const suggest = req.nextUrl.searchParams.get("mode") === "suggest";
-  const limited = rateLimit(req, suggest ? "geocode-suggest" : "geocode");
+  const limited = await rateLimit(req, suggest ? "geocode-suggest" : "geocode");
   if (limited) return limited;
   const q = req.nextUrl.searchParams.get("q")?.trim() ?? "";
   if (q.length < 1 || q.length > 100) return apiError(400, "invalid_query");
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
   const lang = req.nextUrl.searchParams.get("lang") === "en" ? "en" : "ja";
   try {
     const results = await cache.getOrLoad(`${lang}:${q.normalize("NFKC")}`, () => provider.search(q, { lang }));
-    return apiOk({ query: q, results }, { req });
+    return apiOk({ query: q, results });
   } catch (e) {
     if (e instanceof ProviderError) return apiError(502, e.kind === "timeout" ? "geocoding_timeout" : "geocoding_error");
     return internalError("geocode", e);

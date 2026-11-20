@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { StaticPage } from "@/components/StaticPage";
 import { getI18n } from "@/lib/i18n/server";
+import { legalPagesFinal } from "@/lib/config/site";
+import { ContactLinks } from "@/components/SiteDetails";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { m } = await getI18n();
@@ -10,11 +12,13 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ContactPage() {
   const { m, locale } = await getI18n();
   return (
-    <StaticPage title={m.nav.contact} draft>
+    <StaticPage title={m.nav.contact} draft={!legalPagesFinal()}>
       {locale === "en" ? (
         <>
           <p>For questions about this service or to report incorrect data, please contact us below.</p>
-          <p>Contact: [To be filled in before launch (email address or contact form)]</p>
+          <p>
+            Contact: <ContactLinks locale="en" />
+          </p>
           <h2>Before you contact us</h2>
           <ul>
             <li>Errors in map or building information can often be corrected directly on OpenStreetMap.</li>
@@ -26,7 +30,7 @@ export default async function ContactPage() {
         <>
           <p>本サービスに関するお問い合わせ・データの誤りのご報告は、以下の窓口までお寄せください。</p>
           <p>
-            連絡先: 【公開前に記入（メールアドレスまたはお問い合わせフォーム）】
+            連絡先: <ContactLinks locale="ja" />
           </p>
           <h2>お問い合わせの前に</h2>
           <ul>

@@ -1,5 +1,5 @@
 import "server-only";
-import { gzipSync } from "node:zlib";
+import { createHash } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { getConfig } from "@/lib/config/env";
 import type { ValidationIssue } from "@/lib/validation/schemas";
@@ -16,25 +16,15 @@ export function apiError(status: number, code: string, issues?: ValidationIssue[
   return NextResponse.json({ error: { code, issues } }, { status, headers: { "Cache-Control": "no-store" } });
 }
 
-/** これより小さい応答は圧縮しない（圧縮の手間の方が大きい） */
-const GZIP_MIN_BYTES = 1024;
-
 /**
- * 正常応答。`req` を渡すと、ブラウザが対応していれば gzip で圧縮して返す
- * （電車の経路の結果は数十KBになるため、通信の遅い回線では圧縮の効果が大きい。
- * `next start` は API の応答を自動では圧縮しない）。
+ * 正常応答（JSON）。
+ * 圧縮（gzip など）はサーバー（Next.js 16.4.6 以降の `next start`、またはホスティング側）に任せる。
+ * ここでも圧縮すると二重に圧縮され、ブラウザが読めなくなるため、自前では圧縮しない。
  */
-export function apiOk(body: unknown, init?: { cacheSeconds?: number; req?: Request }) {
-  const headers: Record<string, string> = {
-    "Cache-Control": init?.cacheSeconds ? `public, max-age=${init.cacheSeconds}` : "no-store",
-  };
-  const json = JSON.stringify(body);
-  if (init?.req && json.length >= GZIP_MIN_BYTES && /\bgzip\b/.test(init.req.headers.get("accept-encoding") ?? "")) {
-    return new NextResponse(new Uint8Array(gzipSync(json, { level: 6 })), {
-      headers: { ...headers, "Content-Type": "application/json", "Content-Encoding": "gzip", Vary: "Accept-Encoding" },
-    });
-  }
-  return new NextResponse(json, { headers: { ...headers, "Content-Type": "application/json" } });
+export function apiOk(body: unknown, init?: { cacheSeconds?: number }) {
+  return NextResponse.json(body, {
+    headers: { "Cache-Control": init?.cacheSeconds ? `public, max-age=${init.cacheSeconds}` : "no-store" },
+  });
 }
 
 export async function readJsonBody(req: NextRequest): Promise<{ ok: true; body: unknown } | { ok: false; res: NextResponse }> {
@@ -52,36 +42,84 @@ export async function readJsonBody(req: NextRequest): Promise<{ ok: true; body: 
 // ---------------------------------------------------------------- レート制限
 
 /**
- * IP アドレスごとの固定ウィンドウ方式のレート制限（プロセス内）。
- * サーバーレス環境ではインスタンスごとに独立するため厳密ではない。本番では
- * ホスティング側の WAF / レート制限機能と併用すること。IP アドレスは保存せず、メモリ上のみで扱う。
+ * IP アドレスごと・1分ごとの固定ウィンドウ方式のレート制限。
+ * - UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN があれば、全サーバー共通の回数を Redis（Upstash）で数える
+ *   （サーバーレスでインスタンスが複数あっても正しく制限できる）。IP アドレスはハッシュ値にしてから送り、約70秒で消える
+ * - 無い場合、または Redis が遅い・失敗した場合は、このサーバーのメモリ上だけで数える
  */
 const buckets = new Map<string, { count: number; resetAt: number }>();
+const WINDOW_MS = 60_000;
+const REDIS_TIMEOUT_MS = 800;
 
 export function clientKey(req: NextRequest): string {
   const fwd = req.headers.get("x-forwarded-for");
   return (fwd?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "unknown").slice(0, 64);
 }
 
-export function rateLimit(req: NextRequest, bucket: string, weight = 1): NextResponse | null {
-  const limit = getConfig().rateLimitPerMinute;
-  const key = `${bucket}:${clientKey(req)}`;
-  const now = Date.now();
+/** IP アドレスをそのまま外部に送らないためのハッシュ（RATE_LIMIT_SALT で推測しにくくする） */
+function hashedClient(req: NextRequest): string {
+  return createHash("sha256")
+    .update(`${process.env.RATE_LIMIT_SALT ?? "hikage-michi"}:${clientKey(req)}`)
+    .digest("base64url")
+    .slice(0, 22);
+}
+
+function limited(limit: number, count: number, resetAt: number, now: number): NextResponse | null {
+  if (count <= limit) return null;
+  const res = apiError(429, "rate_limited");
+  res.headers.set("Retry-After", String(Math.max(1, Math.ceil((resetAt - now) / 1000))));
+  return res;
+}
+
+function memoryCount(key: string, weight: number, now: number): { count: number; resetAt: number } {
   if (buckets.size > 10_000) {
     for (const [k, v] of buckets) if (v.resetAt < now) buckets.delete(k);
   }
   const b = buckets.get(key);
   if (!b || b.resetAt < now) {
-    buckets.set(key, { count: weight, resetAt: now + 60_000 });
-    return null;
+    const fresh = { count: weight, resetAt: now + WINDOW_MS };
+    buckets.set(key, fresh);
+    return fresh;
   }
   b.count += weight;
-  if (b.count > limit) {
-    const res = apiError(429, "rate_limited");
-    res.headers.set("Retry-After", String(Math.ceil((b.resetAt - now) / 1000)));
-    return res;
+  return b;
+}
+
+/** Upstash Redis（REST）で数える。設定が無い・失敗したときは null */
+async function redisCount(key: string, weight: number, windowStart: number): Promise<number | null> {
+  const url = process.env.UPSTASH_REDIS_REST_URL?.trim();
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN?.trim();
+  if (!url || !token) return null;
+  const redisKey = `hikage:rl:${key}:${windowStart}`;
+  try {
+    const res = await fetch(`${url.replace(/\/+$/, "")}/pipeline`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify([
+        ["INCRBY", redisKey, String(weight)],
+        ["EXPIRE", redisKey, "70"],
+      ]),
+      signal: AbortSignal.timeout(REDIS_TIMEOUT_MS),
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { result?: unknown }[];
+    const n = Number(data[0]?.result);
+    return Number.isFinite(n) ? n : null;
+  } catch {
+    return null;
   }
-  return null;
+}
+
+export async function rateLimit(req: NextRequest, bucket: string, weight = 1): Promise<NextResponse | null> {
+  const limit = getConfig().rateLimitPerMinute;
+  const now = Date.now();
+  const windowStart = Math.floor(now / WINDOW_MS) * WINDOW_MS;
+  const key = `${bucket}:${hashedClient(req)}`;
+  const shared = await redisCount(key, weight, windowStart);
+  if (shared !== null) return limited(limit, shared, windowStart + WINDOW_MS, now);
+  const local = memoryCount(key, weight, now);
+  return limited(limit, local.count, local.resetAt, now);
 }
 
 /** 予期しないエラーを、内部情報を含まない 500 応答にする */

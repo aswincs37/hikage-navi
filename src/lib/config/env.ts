@@ -53,7 +53,7 @@ export function getConfig() {
   const weatherProvider = env("WEATHER_PROVIDER") ?? "open-meteo";
   const openMeteoKey = env("OPEN_METEO_API_KEY");
   return {
-    userAgent: env("HTTP_USER_AGENT") ?? "hikage-michi/0.1 (development)",
+    userAgent: userAgent(),
     requestTimeoutMs: num("PROVIDER_TIMEOUT_MS", 12_000),
     rateLimitPerMinute: num("RATE_LIMIT_PER_MINUTE", 30),
 
@@ -110,6 +110,17 @@ export function getConfig() {
 }
 
 export type AppConfig = ReturnType<typeof getConfig>;
+
+/**
+ * 外部サービスへ名乗る名前。Nominatim などの無料サービスは、運営者が分かる User-Agent を求めている。
+ * HTTP_USER_AGENT が無ければ、公開URL（SITE_URL）から作る。
+ */
+function userAgent(): string {
+  const explicit = env("HTTP_USER_AGENT");
+  if (explicit) return explicit;
+  const site = env("SITE_URL");
+  return site ? `hikage-michi/1.0 (+${site.replace(/\/+$/, "")})` : "hikage-michi/0.1 (development)";
+}
 
 function transitConfig() {
   const provider = env("TRANSIT_PROVIDER");

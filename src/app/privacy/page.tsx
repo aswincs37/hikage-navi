@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { StaticPage } from "@/components/StaticPage";
 import { getI18n } from "@/lib/i18n/server";
+import { legalPagesFinal } from "@/lib/config/site";
+import { ContactLinks, OperatorName } from "@/components/SiteDetails";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { m } = await getI18n();
@@ -11,7 +13,7 @@ export default async function PrivacyPage() {
   const { m, locale } = await getI18n();
   if (locale === "en") {
     return (
-      <StaticPage title={`${m.nav.privacy} policy`} draft updated="November 20, 2026">
+      <StaticPage title={`${m.nav.privacy} policy`} draft={!legalPagesFinal()} updated="November 20, 2026">
         <p>
           <em>This is a translation for convenience. If there is any difference, the Japanese version prevails.</em>
         </p>
@@ -19,7 +21,7 @@ export default async function PrivacyPage() {
         <ul>
           <li>The origin, destination, date and time, travel mode and priorities you enter for a search</li>
           <li>Only if you press &quot;Use my location&quot;: the location from your browser (latitude and longitude, rounded to about 1 m)</li>
-          <li>Your IP address, to prevent abuse (handled briefly in memory only and never stored)</li>
+          <li>Your IP address, to prevent abuse (used for about one minute to count requests; if a shared request counter is used, only a scrambled value is sent, never the address itself, and it is deleted after about a minute)</li>
         </ul>
         <h2>2. How we use it</h2>
         <p>Only to search for routes, estimate sunlight and weather, and prevent abuse of the service.</p>
@@ -41,17 +43,21 @@ export default async function PrivacyPage() {
         <h2>6. Logs</h2>
         <p>Server error logs are designed not to record request contents that include location. However, our hosting provider may keep access logs.</p>
         <h2>7. Contact</h2>
-        <p>Operator name and contact: [To be filled in before launch]</p>
+        <p>
+          Operator: <OperatorName locale="en" />
+          <br />
+          Contact: <ContactLinks locale="en" />
+        </p>
       </StaticPage>
     );
   }
   return (
-    <StaticPage title={`${m.nav.privacy}ポリシー`} draft updated="2026年11月20日">
+    <StaticPage title={`${m.nav.privacy}ポリシー`} draft={!legalPagesFinal()} updated="2026年11月20日">
       <h2>1. 取得する情報</h2>
       <ul>
         <li>検索のために入力された出発地・目的地・日時・移動手段・希望条件</li>
         <li>「現在地を使う」ボタンを押した場合に限り、ブラウザから取得した位置情報（緯度・経度、約1m単位に丸めます）</li>
-        <li>不正利用防止のためのIPアドレス（メモリ上で短時間のみ扱い、保存しません）</li>
+        <li>不正利用防止のためのIPアドレス（アクセス回数の確認のために約1分間だけ扱います。共有の回数カウンターを使う場合も、IPアドレスはそのままの形では送らず、変換した値を約1分で消去します）</li>
       </ul>
       <h2>2. 利用目的</h2>
       <p>経路の検索、日差し・気象の推定、サービスの不正利用の防止のためにのみ利用します。</p>
@@ -73,7 +79,11 @@ export default async function PrivacyPage() {
       <h2>6. ログ</h2>
       <p>サーバーのエラーログには、位置情報を含むリクエスト内容を記録しない設計としています。ただし、ホスティング事業者がアクセスログを記録する場合があります。</p>
       <h2>7. お問い合わせ窓口</h2>
-      <p>運営者名・連絡先: 【公開前に記入】</p>
+      <p>
+        運営者: <OperatorName locale="ja" />
+        <br />
+        連絡先: <ContactLinks locale="ja" />
+      </p>
     </StaticPage>
   );
 }

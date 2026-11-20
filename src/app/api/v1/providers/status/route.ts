@@ -1,4 +1,5 @@
 import { allowPublicDemoEndpoints, getConfig } from "@/lib/config/env";
+import { readinessIssues } from "@/lib/config/readiness";
 import { apiOk } from "@/lib/http/api";
 
 export const dynamic = "force-dynamic";
@@ -20,5 +21,8 @@ export async function GET() {
     wbgt: st(c.wbgt?.forecast),
     shade: st(c.shade?.endpoint),
     publicDemoEndpointsAllowed: allowPublicDemoEndpoints(),
+    rateLimit: process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN ? "shared" : "per_instance",
+    /** 本番公開の準備状況（コードのみ。設定値は返さない）。空なら準備完了 */
+    readiness: readinessIssues().map((i) => ({ level: i.level, code: i.code })),
   });
 }
