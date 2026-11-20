@@ -1,0 +1,9 @@
+# Vercel CLI でアップロードしないもの（秘密の設定・ビルド結果・キャッシュ）
+.env
+.env.local
+.env.*.local
+.next
+node_modules
+coverage
+.cache
+*.tsbuildinfo
