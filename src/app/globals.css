@@ -1,0 +1,207 @@
+@import "tailwindcss";
+@import "maplibre-gl/dist/maplibre-gl.css";
+
+/*
+ * ひかげみち デザイントークン
+ * 乗換案内アプリのような、見慣れた・情報が読み取りやすい配色（白い面・細い罫線・交通系の青）。
+ * 常にライトテーマで表示する。Web フォントは使わない（通信量を抑えるため、端末の日本語フォントを使う）。
+ * 暑さの警告は色だけに頼らず、必ず文字ラベルとアイコンを併記する。
+ */
+:root {
+  /* 基調色（明るいグレーの地に白い面） */
+  --paper: #f2f4f7;
+  --surface: #ffffff;
+  --surface-2: #f5f7fa;
+  --surface-card: #ffffff;
+  --ink: #1f2933;
+  --muted: #56626d;
+  --line: #dce2e9;
+
+  /* 主色（交通系の青） */
+  --ai: #1b5fae;
+  --ai-hover: #154d8f;
+  --ai-mid: #3a7bc8;
+  --ai-light: #e8f1fb;
+  --ai-ink: #ffffff;
+
+  /* 日差し（橙） */
+  --sun: #a65400;
+  --sun-hover: #8a4600;
+  --sun-bright: #ef8a1f;
+  --sun-bg: #fff4e6;
+
+  /* 日陰（緑） */
+  --shade: #1d7a58;
+  --shade-hover: #17654a;
+  --shade-bright: #34a57c;
+  --shade-bg: #e8f6ef;
+
+  /* 車窓: 右側に日差し（左側は --sun-bright）。色だけでなく凡例の文字でも区別する */
+  --side-right: #7a5fb0;
+  --side-right-bg: #f3effa;
+
+  --unknown: #66717a;
+  --unknown-bg: #eef1f4;
+
+  --danger: #c62828;
+  --danger-bg: #fdecec;
+  --warn: #8f5a0a;
+  --warn-bg: #fff5e2;
+  --info-bg: #edf3fa;
+  --focus: #d9730d;
+
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-card: var(--surface-card);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-ai: var(--ai);
+  --color-ai-hover: var(--ai-hover);
+  --color-ai-mid: var(--ai-mid);
+  --color-ai-light: var(--ai-light);
+  --color-ai-ink: var(--ai-ink);
+  --color-sun: var(--sun);
+  --color-sun-hover: var(--sun-hover);
+  --color-sun-bright: var(--sun-bright);
+  --color-sun-bg: var(--sun-bg);
+  --color-shade: var(--shade);
+  --color-shade-hover: var(--shade-hover);
+  --color-shade-bright: var(--shade-bright);
+  --color-shade-bg: var(--shade-bg);
+  --color-side-right: var(--side-right);
+  --color-side-right-bg: var(--side-right-bg);
+  --color-unknown: var(--unknown);
+  --color-unknown-bg: var(--unknown-bg);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+  --color-warn: var(--warn);
+  --color-warn-bg: var(--warn-bg);
+  --color-info-bg: var(--info-bg);
+  /* 角丸は小さめ・影は薄く（日本の交通系アプリに近い、すっきりした見た目） */
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.625rem;
+  --radius-3xl: 0.75rem;
+  --shadow-2xs: none;
+  --shadow-xs: 0 1px 2px rgba(31, 41, 51, 0.05);
+  --shadow-sm: 0 1px 2px rgba(31, 41, 51, 0.06);
+  --shadow-md: 0 1px 3px rgba(31, 41, 51, 0.08);
+  --shadow-lg: 0 2px 6px rgba(31, 41, 51, 0.08);
+  --font-sans: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "BIZ UDPGothic", "Yu Gothic UI", Meiryo, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "palt" 1;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  line-break: strict;
+  min-height: 100vh;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ai);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* 数値は等幅数字で揃える */
+.num {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* 横スクロールのチップ列（スクロールバーを隠す） */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* iPhone のホームバー等を避ける下余白 */
+.pb-safe {
+  padding-bottom: max(0.875rem, env(safe-area-inset-bottom));
+}
+
+/* 白い面（カード）: 細い罫線のみ。押せるカードは罫線の色で反応する */
+.wa-card {
+  background-color: var(--surface);
+  border: 1px solid var(--line);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.wa-card-interactive:hover {
+  border-color: var(--ai-mid);
+}
+
+.wa-badge-glow {
+  box-shadow: none;
+}
+
+.prose-ja h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 2rem 0 0.75rem;
+}
+.prose-ja h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 1.5rem 0 0.5rem;
+}
+.prose-ja p,
+.prose-ja ul,
+.prose-ja ol {
+  margin: 0.75rem 0;
+}
+.prose-ja ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+}
+.prose-ja ol {
+  list-style: decimal;
+  padding-left: 1.5rem;
+}
+.prose-ja a {
+  color: var(--ai);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.prose-ja table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.prose-ja th,
+.prose-ja td {
+  border: 1px solid var(--line);
+  padding: 0.5rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.maplibregl-ctrl-attrib {
+  font-size: 11px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

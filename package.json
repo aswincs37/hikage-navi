@@ -1,0 +1,47 @@
+{
+  "name": "hikage-michi",
+  "version": "0.1.0",
+  "private": true,
+  "description": "日差し・日陰・暑さを考慮して日本国内の移動を比較するウェブアプリ",
+  "scripts": {
+    "predev": "node scripts/copy-maplibre-worker.mjs",
+    "dev": "next dev",
+    "prebuild": "node scripts/copy-maplibre-worker.mjs",
+    "build": "next build --webpack",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "npm run typecheck && npm run lint && npm test && npm run build",
+    "rail:build": "node scripts/build-rail-network.mjs"
+  },
+  "engines": {
+    "node": ">=20.9"
+  },
+  "dependencies": {
+    "astronomy-engine": "^2.1.19",
+    "maplibre-gl": "^6.16.0",
+    "next": "^16.4.3",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "server-only": "^0.0.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^20.19.11",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.4.3",
+    "jsdom": "^26.1.0",
+    "postcss": "^8.5.32",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.2",
+    "vitest": "^4.1.12"
+  }
+}

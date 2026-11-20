@@ -1,0 +1,14 @@
+node_modules/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+.env
+.env.local
+.env.*.local
+.DS_Store
+public/vendor/
+
+# 鉄道ネットワーク作成時の取得キャッシュ
+/.cache/
