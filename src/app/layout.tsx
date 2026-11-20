@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { InstallPrompt } from "@/components/InstallPrompt";
 import { OfflineSupport } from "@/components/OfflineSupport";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -37,6 +38,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             {children}
           </main>
           <SiteFooter />
+          <InstallPrompt />
         </I18nProvider>
       </body>
     </html>

@@ -15,6 +15,12 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: "#f2f4f7",
     theme_color: "#1b5fae",
     lang: "ja",
-    icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" }],
+    // PNG は scripts/generate-icons.mjs で icon.svg の絵柄から作る
+    icons: [
+      { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: "/icons/maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+      { src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" },
+    ],
   };
 }

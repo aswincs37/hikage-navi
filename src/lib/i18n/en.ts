@@ -494,6 +494,13 @@ export const en: Messages = {
     banner: "You're offline.",
     openSaved: "Open saved results",
   },
+  install: {
+    title: "Add to Home Screen",
+    body: "Open it like an app, and see your saved results even with no signal.",
+    button: "Install",
+    iosHint: "In Safari, tap the Share button (□↑) and choose \"Add to Home Screen\".",
+    close: "Close",
+  },
   home: {
     mapPreviewLabel: "Map of the selected start and destination",
     straightDistance: (km: number) => `About ${km < 10 ? km.toFixed(1) : Math.round(km)} km in a straight line`,

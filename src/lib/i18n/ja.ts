@@ -492,6 +492,13 @@ export const ja = {
     banner: "オフラインです。",
     openSaved: "保存した結果を見る",
   },
+  install: {
+    title: "ホーム画面に追加",
+    body: "アプリのようにすぐ開けて、電波が無い所でも保存した結果を見られます。",
+    button: "追加する",
+    iosHint: "Safari の共有ボタン（□↑）から「ホーム画面に追加」を選んでください。",
+    close: "閉じる",
+  },
   home: {
     mapPreviewLabel: "選択した出発地・目的地の地図",
     straightDistance: (km: number) => `直線距離 約${km < 10 ? km.toFixed(1) : Math.round(km)}km`,
