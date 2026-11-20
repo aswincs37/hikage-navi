@@ -36,6 +36,20 @@ Serve over HTTPS behind the platform or a reverse proxy. Node 20.9+ (CI uses 22)
 3. The search routes set `maxDuration = 60`. Check that your plan allows it.
 4. Check `/api/v1/providers/status` after the first deploy.
 
+## Free public services: limits and commercial use
+With `ALLOW_PUBLIC_DEMO_ENDPOINTS=true` the app calls free public servers. `src/lib/http/publicServiceGate.ts` keeps the whole site (all server instances together, via Upstash Redis) under each service's published limits:
+
+| Service | Site-wide limit in the app | Published policy |
+|---|---|---|
+| Nominatim | 1 request / 1.1 s, gives up after 4 s of queueing | max 1 request/s, no autocomplete |
+| Overpass (overpass-api.de) | 1 request / s, 9,000 / day | under 10,000 queries/day |
+| Open-Meteo (free) | 500 / min, 4,500 / hour, 9,000 / day | 600 / min, 5,000 / hour, 10,000 / day, **non-commercial only** |
+| Photon, FOSSGIS OSRM | 120 / min | fair use |
+
+When a limit is reached the request is not sent; that feature shows as temporarily unavailable. Without Upstash the limits are counted per server instance only. Calls to your own servers (any other host name) are not limited.
+
+**Before any commercial use** (ads, paid plans, use inside a company): the Open-Meteo free API and the Vercel Hobby plan are both non-commercial only. Set `OPEN_METEO_API_KEY` (paid plan), move to Vercel Pro (or another host), and replace the other public servers with paid or self-hosted ones (next section).
+
 ## CI
 `.github/workflows/ci.yml` runs `npm audit` (high+), type check, lint, tests (including the rail time benchmarks) and a production build on every push and pull request.
 

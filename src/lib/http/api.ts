@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { getConfig } from "@/lib/config/env";
 import type { ValidationIssue } from "@/lib/validation/schemas";
+import { redisPipeline } from "./redis";
 
 /**
  * API ルートの共通処理。
@@ -49,7 +50,6 @@ export async function readJsonBody(req: NextRequest): Promise<{ ok: true; body: 
  */
 const buckets = new Map<string, { count: number; resetAt: number }>();
 const WINDOW_MS = 60_000;
-const REDIS_TIMEOUT_MS = 800;
 
 export function clientKey(req: NextRequest): string {
   const fwd = req.headers.get("x-forwarded-for");
@@ -87,28 +87,13 @@ function memoryCount(key: string, weight: number, now: number): { count: number;
 
 /** Upstash Redis（REST）で数える。設定が無い・失敗したときは null */
 async function redisCount(key: string, weight: number, windowStart: number): Promise<number | null> {
-  const url = process.env.UPSTASH_REDIS_REST_URL?.trim();
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN?.trim();
-  if (!url || !token) return null;
   const redisKey = `hikage:rl:${key}:${windowStart}`;
-  try {
-    const res = await fetch(`${url.replace(/\/+$/, "")}/pipeline`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body: JSON.stringify([
-        ["INCRBY", redisKey, String(weight)],
-        ["EXPIRE", redisKey, "70"],
-      ]),
-      signal: AbortSignal.timeout(REDIS_TIMEOUT_MS),
-      cache: "no-store",
-    });
-    if (!res.ok) return null;
-    const data = (await res.json()) as { result?: unknown }[];
-    const n = Number(data[0]?.result);
-    return Number.isFinite(n) ? n : null;
-  } catch {
-    return null;
-  }
+  const result = await redisPipeline([
+    ["INCRBY", redisKey, String(weight)],
+    ["EXPIRE", redisKey, "70"],
+  ]);
+  const n = Number(result?.[0]);
+  return result && Number.isFinite(n) ? n : null;
 }
 
 export async function rateLimit(req: NextRequest, bucket: string, weight = 1): Promise<NextResponse | null> {

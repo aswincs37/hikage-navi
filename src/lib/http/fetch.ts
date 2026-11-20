@@ -3,9 +3,11 @@
  * 位置情報を含む URL はログに出さない。
  */
 
+import { passPublicServiceGate, PublicServiceBusyError } from "./publicServiceGate";
+
 export class ProviderError extends Error {
   constructor(
-    public readonly kind: "timeout" | "http" | "network" | "parse",
+    public readonly kind: "timeout" | "http" | "network" | "parse" | "busy",
     public readonly provider: string,
     public readonly status?: number,
   ) {
@@ -23,6 +25,13 @@ export interface FetchOptions {
 }
 
 export async function fetchText(url: string, opts: FetchOptions): Promise<string> {
+  try {
+    // 無料の公開サービスは、サイト全体の呼び出し回数を利用規約の範囲内に抑える
+    await passPublicServiceGate(url);
+  } catch (e) {
+    if (e instanceof PublicServiceBusyError) throw new ProviderError("busy", opts.provider);
+    throw e;
+  }
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), opts.timeoutMs);
   let res: Response;
