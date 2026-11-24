@@ -22,7 +22,7 @@ Serve over HTTPS behind the platform or a reverse proxy. Node 20.9+ (CI uses 22)
 
 ### Check the setup
 - On start, the server logs `[hikage-navi] readiness ...` lines for anything missing (or `readiness: OK`).
-- `GET /api/v1/providers/status` returns the same list as `readiness` (codes only, no URLs or keys). Empty list = ready.
+- `GET /api/v1/providers/status` returns the same list as `readiness` (codes only, no URLs or keys). Empty list = ready. In production it is hidden (404) unless you set `STATUS_TOKEN` and send `Authorization: Bearer <STATUS_TOKEN>`, for example `curl -H "Authorization: Bearer $STATUS_TOKEN" https://<your-site>/api/v1/providers/status`.
 
 ## What production mode adds
 - Security headers: CSP (only this site + GSI map tiles), HSTS, nosniff, frame-deny, referrer and permissions policy.

@@ -119,6 +119,8 @@ export function SearchResults() {
         ? m.results.networkError
         : outcome.code === "rate_limited"
         ? m.results.rateLimited
+        : outcome.code === "daily_limit_reached"
+        ? m.results.dailyLimit
         : outcome.code === "invalid_request"
           ? (outcome.issues ?? []).map((i) => validationText(i.code)).filter((v, i, a) => a.indexOf(v) === i).join(" ") || m.results.invalidRequest
           : m.results.genericError;

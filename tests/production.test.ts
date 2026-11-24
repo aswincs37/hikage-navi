@@ -3,7 +3,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { getConfig } from "@/lib/config/env";
 import { readinessIssues } from "@/lib/config/readiness";
 import { legalPagesFinal, type SiteInfo } from "@/lib/config/site";
-import { rateLimit } from "@/lib/http/api";
+import { rateLimit, searchRateLimit } from "@/lib/http/api";
+import { GET as GET_STATUS } from "@/app/api/v1/providers/status/route";
 
 const site = (over: Partial<SiteInfo> = {}): SiteInfo => ({ legalReviewed: false, ...over });
 const codes = (issues: { code: string }[]) => issues.map((i) => i.code);
@@ -51,6 +52,26 @@ describe("production readiness", () => {
   });
 });
 
+describe("provider status endpoint", () => {
+  const get = (auth?: string) =>
+    GET_STATUS(new NextRequest("http://localhost/api/v1/providers/status", auth ? { headers: { authorization: auth } } : undefined));
+
+  it("is open in development", async () => {
+    vi.stubEnv("NODE_ENV", "development");
+    expect((await get()).status).toBe(200);
+  });
+
+  it("is hidden in production without the right token", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("STATUS_TOKEN", "");
+    expect((await get("Bearer anything")).status).toBe(404);
+    vi.stubEnv("STATUS_TOKEN", "s3cret-token");
+    expect((await get()).status).toBe(404);
+    expect((await get("Bearer wrong")).status).toBe(404);
+    expect((await get("Bearer s3cret-token")).status).toBe(200);
+  });
+});
+
 describe("rate limit", () => {
   const req = () => new NextRequest("http://localhost/api/x", { headers: { "x-forwarded-for": "203.0.113.7" } });
 
@@ -75,5 +96,31 @@ describe("rate limit", () => {
     expect(await rateLimit(req(), "test-fallback")).toBeNull();
     expect(await rateLimit(req(), "test-fallback")).toBeNull();
     expect((await rateLimit(req(), "test-fallback"))?.status).toBe(429);
+  });
+
+  it("caps searches per day as well as per minute, counting weight", async () => {
+    vi.stubEnv("UPSTASH_REDIS_REST_URL", "");
+    vi.stubEnv("RATE_LIMIT_SEARCHES_PER_MINUTE", "100");
+    vi.stubEnv("RATE_LIMIT_SEARCHES_PER_DAY", "6");
+    const day = (ip: string) => new NextRequest("http://localhost/api/x", { headers: { "x-forwarded-for": ip } });
+    expect(await searchRateLimit(day("198.51.100.1"), 5)).toBeNull();
+    expect(await searchRateLimit(day("198.51.100.1"))).toBeNull();
+    const res = await searchRateLimit(day("198.51.100.1"));
+    expect(res?.status).toBe(429);
+    expect((await res!.json()).error.code).toBe("daily_limit_reached");
+    expect(Number(res!.headers.get("Retry-After"))).toBeGreaterThan(60);
+    // 別の IP は影響を受けない
+    expect(await searchRateLimit(day("198.51.100.2"))).toBeNull();
+  });
+
+  it("applies the per-minute search limit before the daily one", async () => {
+    vi.stubEnv("UPSTASH_REDIS_REST_URL", "");
+    vi.stubEnv("RATE_LIMIT_SEARCHES_PER_MINUTE", "2");
+    vi.stubEnv("RATE_LIMIT_SEARCHES_PER_DAY", "100");
+    const r = () => new NextRequest("http://localhost/api/x", { headers: { "x-forwarded-for": "198.51.100.9" } });
+    expect(await searchRateLimit(r())).toBeNull();
+    expect(await searchRateLimit(r())).toBeNull();
+    const res = await searchRateLimit(r());
+    expect((await res!.json()).error.code).toBe("rate_limited");
   });
 });

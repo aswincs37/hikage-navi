@@ -139,6 +139,7 @@ export const en: Messages = {
     providerErrorHelp: "Please try again later. Other travel modes may still work.",
     invalidRequest: "There is a problem with your search.",
     rateLimited: "Too many searches in a short time. Please wait about a minute and try again.",
+    dailyLimit: "You have reached today's search limit. Please try again tomorrow.",
     genericError: "Something went wrong. Please try again later.",
     share: "Share",
     linkCopied: "Link copied",

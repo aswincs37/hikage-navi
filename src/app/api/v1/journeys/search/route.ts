@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { apiError, apiOk, internalError, rateLimit, readJsonBody } from "@/lib/http/api";
+import { apiError, apiOk, internalError, readJsonBody, searchRateLimit } from "@/lib/http/api";
 import { searchJourney } from "@/lib/journey/search";
 import { searchCache, searchCacheKey, worthKeeping } from "@/lib/journey/searchCache";
 import { buildProviders } from "@/lib/providers/registry";
@@ -10,7 +10,7 @@ export const maxDuration = 60;
 
 /** POST /api/v1/journeys/search — 経路検索と日差し・気象・暑さ指数の評価 */
 export async function POST(req: NextRequest) {
-  const limited = await rateLimit(req, "search");
+  const limited = await searchRateLimit(req);
   if (limited) return limited;
   const parsed = await readJsonBody(req);
   if (!parsed.ok) return parsed.res;

@@ -3,16 +3,29 @@ import { InstallPrompt } from "@/components/InstallPrompt";
 import { OfflineSupport } from "@/components/OfflineSupport";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { siteBaseUrl } from "@/lib/config/site";
 import { I18nProvider } from "@/lib/i18n/client";
 import { getI18n, getLocale } from "@/lib/i18n/server";
 import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { m } = await getI18n();
+  const { m, locale } = await getI18n();
+  const title = `${m.brand.name} | ${m.brand.tagline}`;
   return {
-    title: { default: `${m.brand.name} | ${m.brand.tagline}`, template: `%s | ${m.brand.name}` },
+    metadataBase: new URL(siteBaseUrl()),
+    title: { default: title, template: `%s | ${m.brand.name}` },
     description: m.brand.promise,
     applicationName: m.brand.name,
+    // LINE・X などでリンクを共有したときのプレビュー
+    openGraph: {
+      type: "website",
+      siteName: m.brand.name,
+      title,
+      description: m.brand.promise,
+      locale: locale === "en" ? "en_US" : "ja_JP",
+      images: [{ url: "/icons/icon-512.png", width: 512, height: 512, alt: m.brand.name }],
+    },
+    twitter: { card: "summary", title, description: m.brand.promise, images: ["/icons/icon-512.png"] },
     formatDetection: { telephone: false, address: false },
     appleWebApp: { capable: true, title: m.brand.name, statusBarStyle: "default" },
   };

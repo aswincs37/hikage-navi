@@ -39,6 +39,17 @@ const rows: ({ href: string } & Record<Locale, Row>)[] = [
     },
   },
   {
+    href: "https://photon.komoot.io/",
+    ja: { name: "Photon", org: "komoot / OpenStreetMap", use: "入力中の地名・駅名の候補", kind: "地名検索", note: "公開サーバーは節度ある利用が条件。データは ODbL。本番では自前の設置が望ましい。" },
+    en: {
+      name: "Photon",
+      org: "komoot / OpenStreetMap",
+      use: "Place and station suggestions while typing",
+      kind: "Place search",
+      note: "Public server for fair use only. Data under ODbL. Self-hosting is recommended in production.",
+    },
+  },
+  {
     href: "https://routing.openstreetmap.de/about.html",
     ja: { name: "OSRM（FOSSGIS 公開サーバー）", org: "FOSSGIS e.V. / OpenStreetMap", use: "道路（車・バス）の経路", kind: "経路データ", note: "開発・試験用。本番では自前の OSRM を推奨。" },
     en: {

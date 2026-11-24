@@ -14,7 +14,8 @@ Errors always have this shape (no stack traces, no upstream URLs or keys):
 |---|---|---|
 | 400 | `invalid_json`, `invalid_request`, `invalid_query` | Validation failure; `issues[].code` e.g. `outside_japan`, `same_place`, `too_far_for_mode`, `invalid_datetime`, `too_far_past` (>24 h ago), `too_far_future` (>30 days) |
 | 413 | `payload_too_large` | Body > 256 KB |
-| 429 | `rate_limited` | Per-IP budget (`RATE_LIMIT_PER_MINUTE`) exceeded; see `Retry-After` |
+| 429 | `rate_limited` | Per-IP budget per minute exceeded (`RATE_LIMIT_PER_MINUTE`; for route searches `RATE_LIMIT_SEARCHES_PER_MINUTE`); see `Retry-After` |
+| 429 | `daily_limit_reached` | Per-IP route-search budget for the day (`RATE_LIMIT_SEARCHES_PER_DAY`) exceeded; see `Retry-After` |
 | 502/503 | `geocoding_error`, `geocoding_timeout`, `geocoding_not_configured` | Geocoder problems |
 | 500 | `internal_error` | Unexpected failure |
 

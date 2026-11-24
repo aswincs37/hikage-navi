@@ -228,6 +228,15 @@ describe("表示コンポーネント", () => {
     // 徒歩・自転車は検索できない
     expect(fromQuery(new URLSearchParams(toQuery(s).replace("m=train", "m=walk")))).toBeNull();
   });
+
+  it("共有リンクの長すぎる地名は、サーバーの上限（200文字）で切る", () => {
+    const s = { origin: { lat: 35.1, lon: 139.2, label: "あ".repeat(250) }, destination: { lat: 35.2, lon: 139.3, label: "😀".repeat(150) }, departure: "2026-07-01T09:00", mode: "train" as const, preferences: [] };
+    const r = fromQuery(new URLSearchParams(toQuery(s)))!;
+    expect(r.origin.label).toBe("あ".repeat(200));
+    // 絵文字（2単位）の途中では切らない
+    expect(r.destination.label).toBe("😀".repeat(100));
+    expect(fromQuery(new URLSearchParams(toQuery({ ...s, origin: { ...s.origin, label: "   " } })))!.origin.label).toBeUndefined();
+  });
 });
 
 describe("ひと目でわかる結論", () => {
