@@ -16,6 +16,19 @@ export interface SearchParamsState {
 
 const round6 = (v: number) => Math.round(v * 1e6) / 1e6;
 
+/** 地名の長さの上限（サーバーの検証 `label: max(200)` と同じ。UTF-16 の文字数） */
+export const MAX_LABEL_LENGTH = 200;
+
+/** 共有リンクの地名が長すぎると検索が失敗するため、上限で切る（絵文字などの途中では切らない） */
+function cleanLabel(v: string | null): string | undefined {
+  const s = v?.trim();
+  if (!s) return undefined;
+  if (s.length <= MAX_LABEL_LENGTH) return s;
+  let cut = s.slice(0, MAX_LABEL_LENGTH);
+  if (/[\uD800-\uDBFF]$/.test(cut)) cut = cut.slice(0, -1);
+  return cut;
+}
+
 export function toQuery(s: SearchParamsState): string {
   const q = new URLSearchParams({
     olat: String(round6(s.origin.lat)),
@@ -37,8 +50,8 @@ export function fromQuery(q: URLSearchParams): SearchParamsState | null {
     if (v === null || v.trim() === "") return NaN;
     return Number(v);
   };
-  const origin = { lat: num("olat"), lon: num("olon"), label: q.get("ol") ?? undefined };
-  const destination = { lat: num("dlat"), lon: num("dlon"), label: q.get("dl") ?? undefined };
+  const origin = { lat: num("olat"), lon: num("olon"), label: cleanLabel(q.get("ol")) };
+  const destination = { lat: num("dlat"), lon: num("dlon"), label: cleanLabel(q.get("dl")) };
   const mode = q.get("m") as TransportMode;
   const departure = q.get("t") ?? "";
   if (![origin.lat, origin.lon, destination.lat, destination.lon].every(Number.isFinite)) return null;

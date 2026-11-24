@@ -9,7 +9,7 @@
  *
  * 更新時は VERSION を上げる。古い保存分は activate で消える。
  */
-const VERSION = "v1";
+const VERSION = "v2";
 const PAGES = `hikage-pages-${VERSION}`;
 const STATIC = `hikage-static-${VERSION}`;
 const OFFLINE_URL = "/offline";

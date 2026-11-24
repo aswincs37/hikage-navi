@@ -36,6 +36,17 @@ export function getSiteInfo(): SiteInfo {
   };
 }
 
+/**
+ * 公開URL（末尾の / なし）。リンクのプレビュー画像・robots.txt・sitemap.xml の絶対URLに使う。
+ * SITE_URL → Vercel の本番ドメイン（VERCEL_PROJECT_PRODUCTION_URL）→ 開発用の順に決める。
+ */
+export function siteBaseUrl(s: SiteInfo = getSiteInfo()): string {
+  if (s.url) return s.url;
+  const vercel = env("VERCEL_PROJECT_PRODUCTION_URL");
+  if (vercel) return `https://${vercel.replace(/^https?:\/\//, "").replace(/\/+$/, "")}`;
+  return "http://localhost:3000";
+}
+
 /** 規約・ポリシーを正式版（「下書き」表示なし）として出せるか */
 export function legalPagesFinal(s: SiteInfo = getSiteInfo()): boolean {
   return s.legalReviewed && !!s.operatorName && !!(s.contactEmail || s.contactFormUrl);

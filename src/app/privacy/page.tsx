@@ -13,7 +13,7 @@ export default async function PrivacyPage() {
   const { m, locale } = await getI18n();
   if (locale === "en") {
     return (
-      <StaticPage title={`${m.nav.privacy} policy`} draft={!legalPagesFinal()} updated="November 20, 2026">
+      <StaticPage title={`${m.nav.privacy} policy`} draft={!legalPagesFinal()} updated="November 24, 2026">
         <p>
           <em>This is a translation for convenience. If there is any difference, the Japanese version prevails.</em>
         </p>
@@ -33,7 +33,7 @@ export default async function PrivacyPage() {
         <h2>4. Sharing with third parties</h2>
         <p>To calculate routes, weather and so on, we send the coordinates and times needed for your search to the external services below. Each service&apos;s own privacy policy applies.</p>
         <ul>
-          <li>Routing (OSRM, etc.), place search (Geospatial Information Authority of Japan, Nominatim), building data (Overpass API), weather (Open-Meteo), heat index (Ministry of the Environment), base map (GSI map tiles)</li>
+          <li>Routing (OSRM, etc.), place search (Geospatial Information Authority of Japan, Nominatim, and Photon by komoot for suggestions while you type — the text you type is sent), building data (Overpass API), weather (Open-Meteo), heat index (Ministry of the Environment), base map (GSI map tiles)</li>
         </ul>
         <p>We never send information that identifies you personally (name, email address, etc.).</p>
         <h2>5. Cookies and analytics</h2>
@@ -52,7 +52,7 @@ export default async function PrivacyPage() {
     );
   }
   return (
-    <StaticPage title={`${m.nav.privacy}ポリシー`} draft={!legalPagesFinal()} updated="2026年11月20日">
+    <StaticPage title={`${m.nav.privacy}ポリシー`} draft={!legalPagesFinal()} updated="2026年11月24日">
       <h2>1. 取得する情報</h2>
       <ul>
         <li>検索のために入力された出発地・目的地・日時・移動手段・希望条件</li>
@@ -69,7 +69,7 @@ export default async function PrivacyPage() {
       <h2>4. 第三者への送信</h2>
       <p>経路・気象などを求めるため、検索に必要な座標・日時を以下の外部サービスへ送信します。各サービスのプライバシーポリシーが適用されます。</p>
       <ul>
-        <li>経路検索（OSRM 等）、地名検索（国土地理院・Nominatim）、建物データ（Overpass API）、気象（Open-Meteo）、暑さ指数（環境省）、背景地図（国土地理院の地図タイル）</li>
+        <li>経路検索（OSRM 等）、地名検索（国土地理院・Nominatim、入力中の候補表示には komoot 社の Photon。入力中の文字が送信されます）、建物データ（Overpass API）、気象（Open-Meteo）、暑さ指数（環境省）、背景地図（国土地理院の地図タイル）</li>
       </ul>
       <p>個人を特定する情報（氏名・メールアドレス等）は送信しません。</p>
       <h2>5. Cookie・アクセス解析</h2>

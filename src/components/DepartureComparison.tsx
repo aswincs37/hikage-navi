@@ -22,7 +22,7 @@ const LEVEL_ORDER: HeatWarning["level"][] = ["danger", "warning", "caution", "in
 export function DepartureComparison({ params }: Props) {
   const { m, formatDuration, formatTime } = useI18n();
   const [timesText, setTimesText] = useState("09:00, 11:00, 13:00, 15:00, 17:00");
-  const [state, setState] = useState<"idle" | "loading" | "error" | "invalid">("idle");
+  const [state, setState] = useState<"idle" | "loading" | "error" | "invalid" | "limited" | "daily">("idle");
   const [result, setResult] = useState<{ options: Option[]; durationsAreTimeIndependent: boolean; notices: ProviderNotice[] } | null>(null);
 
   async function run() {
@@ -43,6 +43,11 @@ export function DepartureComparison({ params }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...params, times }),
       });
+      if (res.status === 429) {
+        const body = (await res.json().catch(() => null)) as { error?: { code?: string } } | null;
+        setState(body?.error?.code === "daily_limit_reached" ? "daily" : "limited");
+        return;
+      }
       if (!res.ok) throw new Error(String(res.status));
       setResult(await res.json());
       setState("idle");
@@ -97,6 +102,8 @@ export function DepartureComparison({ params }: Props) {
       <div aria-live="polite">
         {state === "invalid" && <p className="mt-2 text-xs font-semibold text-danger">{m.departures.invalidTimes}</p>}
         {state === "error" && <p className="mt-2 text-xs font-semibold text-danger">{m.results.genericError}</p>}
+        {state === "limited" && <p className="mt-2 text-xs font-semibold text-danger">{m.results.rateLimited}</p>}
+        {state === "daily" && <p className="mt-2 text-xs font-semibold text-danger">{m.results.dailyLimit}</p>}
       </div>
 
       {result && (

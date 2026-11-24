@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { apiError, apiOk, internalError, rateLimit, readJsonBody } from "@/lib/http/api";
+import { apiError, apiOk, internalError, readJsonBody, searchRateLimit } from "@/lib/http/api";
 import { compareDepartures } from "@/lib/journey/search";
 import { buildProviders } from "@/lib/providers/registry";
 import { validateDepartureTimes, validateJourneyRequest } from "@/lib/validation/schemas";
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   const times = validateDepartureTimes(body.times);
   if (!times.ok) return apiError(400, "invalid_request", times.issues);
   // 時刻の数だけ重く数える
-  const limited = await rateLimit(req, "search", times.value.length);
+  const limited = await searchRateLimit(req, times.value.length);
   if (limited) return limited;
   const v = validateJourneyRequest(body);
   if (!v.ok) return apiError(400, "invalid_request", v.issues);

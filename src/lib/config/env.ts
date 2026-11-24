@@ -56,6 +56,9 @@ export function getConfig() {
     userAgent: userAgent(),
     requestTimeoutMs: num("PROVIDER_TIMEOUT_MS", 12_000),
     rateLimitPerMinute: num("RATE_LIMIT_PER_MINUTE", 30),
+    /** 経路検索だけの上限（1つのIPあたり）。比較は時刻の数だけ数える */
+    searchesPerMinute: num("RATE_LIMIT_SEARCHES_PER_MINUTE", 10),
+    searchesPerDay: num("RATE_LIMIT_SEARCHES_PER_DAY", 300),
 
     geocoding: {
       gsi: env("GSI_GEOCODER_URL") === "none" ? null : endpoint(env("GSI_GEOCODER_URL"), PUBLIC_DEFAULTS.gsiGeocoder),

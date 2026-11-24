@@ -92,10 +92,11 @@ export function RouteMap({ routes, selectedId, segments, origin, destination, on
     let cancelled = false;
     let map: MlMap | null = null;
     import("maplibre-gl")
-      .then(({ Map, NavigationControl, setWorkerUrl }) => {
+      .then(({ Map, NavigationControl, setWorkerUrl, getVersion }) => {
         if (cancelled || !container.current) return;
         // バンドル後は既定のワーカー位置が解決できないため、public/vendor に複製したものを使う（scripts/copy-maplibre-worker.mjs）
-        setWorkerUrl("/vendor/maplibre-gl-worker.mjs");
+        // ?v= に版を付ける: Service Worker が古いワーカーを保存したままでも、MapLibre を更新すれば新しいものを取りに行く
+        setWorkerUrl(`/vendor/maplibre-gl-worker.mjs?v=${getVersion()}`);
         map = new Map({
           container: container.current,
           style: gsiStyle(m.map.tiles),

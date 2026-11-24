@@ -140,6 +140,7 @@ export const ja = {
     providerErrorHelp: "時間をおいて再度お試しください。他の移動手段は利用できる場合があります。",
     invalidRequest: "検索条件に誤りがあります。",
     rateLimited: "短時間に多くの検索が行われました。1分ほどおいてから再度お試しください。",
+    dailyLimit: "本日の検索回数の上限に達しました。明日またお試しください。",
     genericError: "エラーが発生しました。時間をおいて再度お試しください。",
     share: "共有",
     linkCopied: "リンクをコピーしました",
