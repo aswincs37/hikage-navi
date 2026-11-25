@@ -41,10 +41,18 @@ export function getSiteInfo(): SiteInfo {
  * SITE_URL → Vercel の本番ドメイン（VERCEL_PROJECT_PRODUCTION_URL）→ 開発用の順に決める。
  */
 export function siteBaseUrl(s: SiteInfo = getSiteInfo()): string {
-  if (s.url) return s.url;
-  const vercel = env("VERCEL_PROJECT_PRODUCTION_URL");
-  if (vercel) return `https://${vercel.replace(/^https?:\/\//, "").replace(/\/+$/, "")}`;
-  return "http://localhost:3000";
+  return normalizeUrl(s.url) ?? normalizeUrl(env("VERCEL_PROJECT_PRODUCTION_URL")) ?? "http://localhost:3000";
+}
+
+/** "hikage-navi.online" のように https:// が無くても受け付ける。URL として不正なら undefined（ページを落とさない） */
+function normalizeUrl(v: string | undefined): string | undefined {
+  if (!v) return undefined;
+  const withScheme = /^https?:\/\//i.test(v) ? v : `https://${v}`;
+  try {
+    return new URL(withScheme).origin;
+  } catch {
+    return undefined;
+  }
 }
 
 /** 規約・ポリシーを正式版（「下書き」表示なし）として出せるか */
