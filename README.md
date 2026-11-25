@@ -25,7 +25,7 @@ Why no Python/FastAPI or PostGIS: all geometry here runs over a few hundred poin
 
 ## Run locally
 
-Requirements: Node.js ≥ 20.9 (developed on Node 20.17).
+Requirements: Node.js 22.x.
 
 ```bash
 npm install          # the author used --ignore-scripts; no package needs install scripts
