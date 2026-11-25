@@ -4,7 +4,7 @@ import { proportionalOffsets, lineLengthM } from "@/lib/geo/geometry";
 import { apiError, apiOk, internalError, rateLimit, readJsonBody } from "@/lib/http/api";
 import { evaluateSegments, summariseExposure, vehicleSideExposure } from "@/lib/solar/exposure";
 import { addSeconds, parseDateTime, toTokyoIso } from "@/lib/time/tokyo";
-import { exposureRequestSchema } from "@/lib/validation/schemas";
+import { exposureRequestSchema, toValidationIssues } from "@/lib/validation/schemas";
 import type { ProviderNotice } from "@/lib/domain/types";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
   const parsed = await readJsonBody(req);
   if (!parsed.ok) return parsed.res;
   const v = exposureRequestSchema.safeParse(parsed.body);
-  if (!v.success) return apiError(400, "invalid_request", v.error.issues.map((i) => ({ field: i.path.join("."), code: `invalid_${i.code}` })));
+  if (!v.success) return apiError(400, "invalid_request", toValidationIssues(v.error.issues, ""));
   const departure = parseDateTime(v.data.departure);
   if (!departure) return apiError(400, "invalid_request", [{ field: "departure", code: "invalid_datetime" }]);
 
