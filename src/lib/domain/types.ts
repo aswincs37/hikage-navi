@@ -235,6 +235,11 @@ export interface VehicleSideExposure {
   totalMin: number;
   /** 日差しが少ないと推定される側 */
   shadierSide: "left" | "right" | "similar" | "unknown";
+  /**
+   * 左右の差は小さめ。分数では片側が少ないが、横から差し込む日差しの量（横向きの成分で重み付け）はほぼ同じ。
+   * 反対側の日差しの多くが正面寄りから差し込む場合など。shadierSide が left / right のときだけ true になりうる。
+   */
+  slightDifference?: boolean;
   caveats: string[];
 }
 

@@ -124,6 +124,30 @@ describe("列車の左右の日差し", () => {
     expect(sideWeight(270, { aboveHorizon: true, elevationDeg: 8, azimuthDeg: 180 })).toBeCloseTo(1);
   });
 
+  it("反対側の日差しの多くが正面寄りなら、少ない側をすすめつつ「差は小さめ」とする", () => {
+    // 11月の正午、太陽は南（方位約180°）。西へ13分（左真横から）→ 方位155°へ25分（右前方25〜35°から）
+    const along = (from: LonLat, bearingDeg: number, meters: number, steps = 20): LonLat[] => {
+      const b = (bearingDeg * Math.PI) / 180;
+      const dLat = (meters * Math.cos(b)) / 111_195;
+      const dLon = (meters * Math.sin(b)) / (111_195 * Math.cos((from[1] * Math.PI) / 180));
+      return Array.from({ length: steps + 1 }, (_, i) => [from[0] + (dLon * i) / steps, from[1] + (dLat * i) / steps] as LonLat);
+    };
+    const west = along(START, 270, 13_000);
+    const sse = along(west[west.length - 1]!, 155, 25_000).slice(1);
+    const r = route("s", [leg("car", [...west, ...sse], t("2026-11-25T12:00"), 38 * 60)]);
+    const [side] = vehicleSideExposure(evaluateSegments(r, { shadeModel: null }), r);
+    expect(side!.leftMin).toBeLessThan(side!.rightMin);
+    expect(side!.shadierSide).toBe("left");
+    expect(side!.slightDifference).toBe(true);
+  });
+
+  it("はっきり差がある場合は「差は小さめ」を付けない", () => {
+    const r = route("t", [leg("rail", line(START, "north", 30_000, 60), t("2026-08-01T07:30"), 1800)]);
+    const [side] = vehicleSideExposure(evaluateSegments(r, { shadeModel: null }), r);
+    expect(side!.shadierSide).toBe("left");
+    expect(side!.slightDifference).toBeUndefined();
+  });
+
   it("重み付けの結論を、表示する左右の分数と食い違わないように調整する", () => {
     // はっきり差がある（合計の20%以上・5分以上）なら、重み付けで「差は小さい」でも少ない側
     expect(reconcileSideWithMinutes("similar", 13, 25)).toBe("left");

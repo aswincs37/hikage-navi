@@ -234,7 +234,10 @@ export function vehicleSideExposure(segments: SegmentEstimate[], route: RouteAlt
     const leftMin = toMin(left);
     const rightMin = toMin(right);
     // 結論は、利用者に表示する左右の分数と矛盾させない
+    const weightedSide = shadierSide;
     shadierSide = reconcileSideWithMinutes(shadierSide, leftMin, rightMin);
+    // 分数では差があっても、横から差し込む日差しの量ではほぼ同じなら「差は小さめ」と添える
+    const slightDifference = weightedSide === "similar" && (shadierSide === "left" || shadierSide === "right");
 
     result.push({
       legIndex,
@@ -245,6 +248,7 @@ export function vehicleSideExposure(segments: SegmentEstimate[], route: RouteAlt
       nightMin: toMin(night),
       totalMin: toMin(total),
       shadierSide,
+      ...(slightDifference && { slightDifference }),
       caveats,
     });
   });

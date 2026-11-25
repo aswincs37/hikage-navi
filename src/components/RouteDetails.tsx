@@ -198,7 +198,8 @@ export function RouteDetails() {
             const prev = r.route.legs[i - 1];
             const stopName = l.fromName ?? (i === 0 ? params.origin.label : prev?.toName) ?? (i === 0 ? m.map.origin : "");
             const arrived = prev && prev.endTime !== l.startTime ? prev.endTime : null;
-            const side = r.vehicleSides.find((s) => s.legIndex === i)?.shadierSide;
+            const legSide = r.vehicleSides.find((s) => s.legIndex === i);
+            const side = legSide?.shadierSide;
             const walk = l.outdoor;
             return (
               <li key={i}>
@@ -220,7 +221,7 @@ export function RouteDetails() {
                     {(side === "left" || side === "right") && (
                       <p className="inline-flex items-center gap-1 rounded bg-shade-bg px-1.5 py-0.5 text-xs font-bold text-shade">
                         <span aria-hidden="true">🪑</span>
-                        {side === "left" ? m.quick.seatChipLeft : m.quick.seatChipRight}
+                        {m.quick.seatChip(side === "left" ? m.quick.seatChipLeft : m.quick.seatChipRight, legSide?.slightDifference === true)}
                       </p>
                     )}
                   </div>

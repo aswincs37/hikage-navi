@@ -6,7 +6,15 @@ import { reconcileSideWithMinutes } from "@/lib/solar/side";
 import { HeatWarnings } from "./Badges";
 
 export type SeatVerdict =
-  | { kind: "left" | "right" | "similar"; leftMin: number; rightMin: number; /** 区間によっては反対側に日が当たる */ changes?: boolean }
+  | {
+      kind: "left" | "right" | "similar";
+      leftMin: number;
+      rightMin: number;
+      /** 区間によっては反対側に日が当たる */
+      changes?: boolean;
+      /** すすめる側の方が日差しは少ないが、差は小さめ */
+      slight?: boolean;
+    }
   | { kind: "mixed" | "unknown" | "no_sun" };
 
 /**
@@ -29,7 +37,11 @@ export function seatVerdict(sides: VehicleSideExposure[]): SeatVerdict {
   }
   // 区間ごとの結論を合計しても、表示する左右の分数と食い違わないようにする
   const kind = decided.size === 0 ? "similar" : ([...decided][0] as "left" | "right");
-  return { kind: reconcileSideWithMinutes(kind, leftMin, rightMin), leftMin, rightMin };
+  const final = reconcileSideWithMinutes(kind, leftMin, rightMin);
+  if (final === "similar") return { kind: final, leftMin, rightMin };
+  // 「差は小さめ」: どの区間も重み付けでは差がない（合計の分数で決まった）か、その側をすすめた区間がすべて「差は小さめ」
+  const slight = kind === "similar" || known.filter((s) => s.shadierSide === final).every((s) => s.slightDifference);
+  return { kind: final, leftMin, rightMin, ...(slight && { slight }) };
 }
 
 /** 上から見た車両の図。おすすめの側を緑（🌿・「おすすめ」）、日が当たる側を橙（☀）で示す */
@@ -166,7 +178,7 @@ function Seat3D({ side }: { side: "left" | "right" }) {
 }
 
 /** 座席の結論を大きく見せる帯。色はおすすめ＝日陰の緑（赤はこのアプリでは暑さの「危険」に使うため避ける） */
-function SeatHero({ side, headline }: { side: "left" | "right"; headline: string }) {
+function SeatHero({ side, headline, slight = false }: { side: "left" | "right"; headline: string; slight?: boolean }) {
   const { m } = useI18n();
   return (
     <div className="relative overflow-hidden rounded-lg bg-shade p-4 text-white">
@@ -187,7 +199,7 @@ function SeatHero({ side, headline }: { side: "left" | "right"; headline: string
             </span>
             <span className={`text-base font-bold text-white/90`}>{m.quick.seatSuffix}</span>
           </p>
-          <p className="mt-1.5 text-xs font-semibold text-white/85">🌿 {m.quick.shadierSideNote}</p>
+          <p className="mt-1.5 text-xs font-semibold text-white/85">🌿 {slight ? m.quick.shadierSideSlightNote : m.quick.shadierSideNote}</p>
         </div>
       </div>
     </div>
@@ -197,9 +209,10 @@ function SeatHero({ side, headline }: { side: "left" | "right"; headline: string
 function VehicleAnswer({ sides }: { sides: VehicleSideExposure[] }) {
   const { m } = useI18n();
   const v = seatVerdict(sides);
+  const slight = "slight" in v && v.slight === true;
   const headline = {
-    left: m.quick.seatLeft,
-    right: m.quick.seatRight,
+    left: slight ? m.quick.seatLeftSlight : m.quick.seatLeft,
+    right: slight ? m.quick.seatRightSlight : m.quick.seatRight,
     similar: m.quick.seatSimilar,
     mixed: m.quick.seatMixed,
     unknown: m.quick.seatUnknown,
@@ -208,7 +221,7 @@ function VehicleAnswer({ sides }: { sides: VehicleSideExposure[] }) {
   return (
     <div className="space-y-3">
       {v.kind === "left" || v.kind === "right" ? (
-        <SeatHero side={v.kind} headline={headline} />
+        <SeatHero side={v.kind} headline={headline} slight={slight} />
       ) : (
         <p className="flex items-center gap-2 text-2xl font-black leading-tight text-ink">
           <span aria-hidden="true">🪑</span>
