@@ -6,7 +6,7 @@ import { Court, OperatorName } from "@/components/SiteDetails";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { m } = await getI18n();
-  return { title: m.nav.terms };
+  return { title: m.nav.terms, alternates: { canonical: "/terms" } };
 }
 
 export default async function TermsPage() {

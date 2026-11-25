@@ -6,7 +6,7 @@ import { ContactLinks } from "@/components/SiteDetails";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { m } = await getI18n();
-  return { title: m.nav.contact };
+  return { title: m.nav.contact, alternates: { canonical: "/contact" } };
 }
 
 export default async function ContactPage() {

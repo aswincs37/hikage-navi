@@ -6,7 +6,7 @@ import { ContactLinks, OperatorName } from "@/components/SiteDetails";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { m } = await getI18n();
-  return { title: m.nav.privacy };
+  return { title: m.nav.privacy, alternates: { canonical: "/privacy" } };
 }
 
 export default async function PrivacyPage() {

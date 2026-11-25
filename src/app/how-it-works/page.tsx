@@ -4,7 +4,7 @@ import { getI18n } from "@/lib/i18n/server";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { m } = await getI18n();
-  return { title: m.nav.howItWorks };
+  return { title: m.nav.howItWorks, alternates: { canonical: "/how-it-works" } };
 }
 
 export default async function HowItWorksPage() {
