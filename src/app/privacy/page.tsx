@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { StaticPage } from "@/components/StaticPage";
 import { getI18n } from "@/lib/i18n/server";
+import { staticPageMetadata } from "@/lib/seo/metadata";
 import { legalPagesFinal } from "@/lib/config/site";
 import { ContactLinks, OperatorName } from "@/components/SiteDetails";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { m } = await getI18n();
-  return { title: m.nav.privacy, alternates: { canonical: "/privacy" } };
+  return staticPageMetadata("privacy", m.nav.privacy, "/privacy");
 }
 
 export default async function PrivacyPage() {

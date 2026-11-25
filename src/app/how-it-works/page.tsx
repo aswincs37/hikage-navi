@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { StaticPage } from "@/components/StaticPage";
 import { getI18n } from "@/lib/i18n/server";
+import { staticPageMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { m } = await getI18n();
-  return { title: m.nav.howItWorks, alternates: { canonical: "/how-it-works" } };
+  return staticPageMetadata("howItWorks", m.nav.howItWorks, "/how-it-works");
 }
 
 export default async function HowItWorksPage() {

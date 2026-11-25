@@ -21,7 +21,7 @@ export function homeStructuredData(): object {
         url,
         name: ja.brand.name,
         alternateName: en.brand.name,
-        description: ja.brand.promise,
+        description: ja.meta.home,
         inLanguage: ["ja", "en"],
       },
       {
@@ -30,7 +30,7 @@ export function homeStructuredData(): object {
         name: ja.brand.name,
         alternateName: en.brand.name,
         url,
-        description: ja.brand.promise,
+        description: ja.meta.home,
         applicationCategory: "TravelApplication",
         operatingSystem: "Any",
         browserRequirements: "Requires JavaScript",
