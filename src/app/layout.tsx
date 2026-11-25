@@ -14,18 +14,18 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: new URL(siteBaseUrl()),
     title: { default: title, template: `%s | ${m.brand.name}` },
-    description: m.brand.promise,
+    description: m.meta.home,
     applicationName: m.brand.name,
-    // LINE・X などでリンクを共有したときのプレビュー
+    // LINE・X などでリンクを共有したときのプレビュー（固定ページは src/lib/seo/metadata.ts で上書きする）
     openGraph: {
       type: "website",
       siteName: m.brand.name,
       title,
-      description: m.brand.promise,
+      description: m.meta.home,
       locale: locale === "en" ? "en_US" : "ja_JP",
-      images: [{ url: "/icons/icon-512.png", width: 512, height: 512, alt: m.brand.name }],
+      images: [{ url: "/og-image.png", width: 1200, height: 630, alt: title }],
     },
-    twitter: { card: "summary", title, description: m.brand.promise, images: ["/icons/icon-512.png"] },
+    twitter: { card: "summary_large_image", title, description: m.meta.home, images: [{ url: "/og-image.png", alt: title }] },
     formatDetection: { telephone: false, address: false },
     appleWebApp: { capable: true, title: m.brand.name, statusBarStyle: "default" },
   };

@@ -9,6 +9,15 @@ export const en: Messages = {
     badge: "Shade route guide",
     footerTagline: "A new way to travel, chosen by shade and heat",
   },
+  meta: {
+    home: "For hot-day travel in Japan. Enter where you're going to compare sunlight, building shade, temperature, UV and the heat index (WBGT) for each route, and see which side of the train or bus gets the sun. Free, no sign-up.",
+    howItWorks: "How Hikage Navi works: how it combines astronomical sun-position calculations, shade estimated from map building data, weather forecasts and the Ministry of the Environment heat index for each section of a route.",
+    about: "Hikage Navi is a route guide that lets you choose how to travel by sunlight and heat. It labels forecasts, calculations and estimates separately and never makes up data. See what it supports and why.",
+    dataSources: "Where Hikage Navi's data comes from: routing, place search and buildings (OpenStreetMap), weather (Open-Meteo), heat index (Ministry of the Environment), maps (GSI) and their terms of use.",
+    privacy: "Hikage Navi's privacy policy: how searches and location are handled, what is sent to external services, and cookies. No account is needed, and searches and locations are not stored.",
+    terms: "Hikage Navi's terms of use, including that sunlight, shade and heat information are estimates and forecasts, prohibited conduct, and disclaimers.",
+    contact: "Contact Hikage Navi with questions about the service or to report incorrect data.",
+  },
   nav: {
     home: "Home",
     howItWorks: "How it works",

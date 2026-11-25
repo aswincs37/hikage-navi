@@ -4,10 +4,13 @@ import { JourneyForm } from "@/components/JourneyForm";
 import { fromQuery } from "@/lib/journey/query";
 import { getConfig } from "@/lib/config/env";
 import { getI18n } from "@/lib/i18n/server";
+import { homeMetadata } from "@/lib/seo/metadata";
 import { homeStructuredData, toJsonLd } from "@/lib/seo/structured-data";
 
-/** ?from=…&to=… 付きの URL もトップページとして扱う */
-export const metadata: Metadata = { alternates: { canonical: "/" } };
+/** ?from=…&to=… 付きの URL もトップページとして扱う（canonical は /） */
+export async function generateMetadata(): Promise<Metadata> {
+  return homeMetadata();
+}
 
 export default async function HomePage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const sp = await searchParams;
