@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { LonLat } from "@/lib/domain/types";
 import { evaluateSegments, relativeSunSide, roundParts, summariseExposure, vehicleSideExposure } from "@/lib/solar/exposure";
-import { sideWeight, vehicleSunSide } from "@/lib/solar/side";
+import { clearlyShadierSide, reconcileSideWithMinutes, sideWeight, vehicleSunSide } from "@/lib/solar/side";
 import { ShadeModel } from "@/lib/shade/engine";
 import { leg, line, route, t } from "./helpers";
 
@@ -122,6 +122,24 @@ describe("列車の左右の日差し", () => {
     expect(vehicleSunSide(200, { aboveHorizon: true, elevationDeg: 8, azimuthDeg: 245 })).toBe("right");
     expect(vehicleSunSide(270, { aboveHorizon: true, elevationDeg: 65, azimuthDeg: 180 })).toBe("none");
     expect(sideWeight(270, { aboveHorizon: true, elevationDeg: 8, azimuthDeg: 180 })).toBeCloseTo(1);
+  });
+
+  it("重み付けの結論を、表示する左右の分数と食い違わないように調整する", () => {
+    // はっきり差がある（合計の20%以上・5分以上）なら、重み付けで「差は小さい」でも少ない側
+    expect(reconcileSideWithMinutes("similar", 13, 25)).toBe("left");
+    expect(reconcileSideWithMinutes("similar", 25, 13)).toBe("right");
+    // すすめる側の分数が反対側以上なら「差は小さい」
+    expect(reconcileSideWithMinutes("left", 9, 7)).toBe("similar");
+    expect(reconcileSideWithMinutes("right", 8, 8)).toBe("similar");
+    // 分数と矛盾しなければ重み付けの結論のまま
+    expect(reconcileSideWithMinutes("left", 7, 9)).toBe("left");
+    expect(reconcileSideWithMinutes("similar", 5, 6)).toBe("similar");
+    expect(reconcileSideWithMinutes("unknown", 0, 30)).toBe("unknown");
+    // 差が小さいとき（合計の20%未満、または5分未満）ははっきりした側なし
+    expect(clearlyShadierSide(50, 60)).toBeNull();
+    expect(clearlyShadierSide(1, 4)).toBeNull();
+    expect(clearlyShadierSide(10, 18)).toBe("left");
+    expect(clearlyShadierSide(0, 5)).toBe("left");
   });
 
   it("地下鉄はどちら側とも判定しない", () => {
