@@ -114,9 +114,13 @@ export function VehicleSideSummary({ sides }: { sides: VehicleSideExposure[] }) 
       {sides.map((s) => (
         <li key={s.legIndex} className="rounded-lg border border-line bg-surface-2 p-2.5">
           {s.shadierSide === "left"
-            ? m.vehicle.shadierLeft
+            ? s.slightDifference
+              ? m.vehicle.shadierLeftSlight
+              : m.vehicle.shadierLeft
             : s.shadierSide === "right"
-              ? m.vehicle.shadierRight
+              ? s.slightDifference
+                ? m.vehicle.shadierRightSlight
+                : m.vehicle.shadierRight
               : s.shadierSide === "similar"
                 ? m.vehicle.similar
                 : m.vehicle.unknown}
@@ -177,7 +181,12 @@ function KeyChips({ r }: { r: EvaluatedRoute }) {
   const seat = seatVerdict(r.vehicleSides);
   const chips: { key: string; icon: string; text: string; cls: string }[] = [];
   if (seat.kind === "left" || seat.kind === "right")
-    chips.push({ key: "seat", icon: "🪑", text: seat.kind === "left" ? m.quick.seatChipLeft : m.quick.seatChipRight, cls: "bg-shade-bg text-shade border-shade/30" });
+    chips.push({
+      key: "seat",
+      icon: "🪑",
+      text: m.quick.seatChip(seat.kind === "left" ? m.quick.seatChipLeft : m.quick.seatChipRight, seat.slight === true),
+      cls: "bg-shade-bg text-shade border-shade/30",
+    });
   if (e.outdoorMin > 0 && e.sunUpOutdoorMin > 0) {
     if (e.potentialSunMin > 0 || e.unknownShadeMin === 0)
       chips.push({ key: "sun", icon: "☀️", text: m.quick.walkSun(e.potentialSunMin), cls: "bg-sun-bg text-sun border-sun-bright/30" });

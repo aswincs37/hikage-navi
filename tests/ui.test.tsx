@@ -265,6 +265,30 @@ describe("ひと目でわかる結論", () => {
     expect(seatVerdict([side({ shadierSide: "left", leftMin: 12, rightMin: 10 }), side({ legIndex: 1, shadierSide: "similar", leftMin: 3, rightMin: 3 })]).kind).toBe("similar");
   });
 
+  it("「差は小さめ」: 横から差し込む日差しの量ではほぼ同じなら、すすめる側に添える", () => {
+    // エンジンが「差は小さめ」とした区間（大阪駅→関西空港 14:00 の実例）
+    expect(seatVerdict([side({ shadierSide: "left", slightDifference: true, leftMin: 13, rightMin: 25 })])).toEqual({ kind: "left", leftMin: 13, rightMin: 25, slight: true });
+    // どの区間も重み付けでは差がなく、合計の分数で決まった場合
+    expect(seatVerdict([side({ shadierSide: "similar", leftMin: 4, rightMin: 8 }), side({ legIndex: 1, shadierSide: "similar", leftMin: 4, rightMin: 8 })])).toMatchObject({ kind: "left", slight: true });
+    // はっきり差がある区間が1つでもあれば「差は小さめ」としない
+    expect(
+      seatVerdict([side({ shadierSide: "left", slightDifference: true, leftMin: 13, rightMin: 25 }), side({ legIndex: 1, shadierSide: "left", leftMin: 0, rightMin: 30 })]),
+    ).toEqual({ kind: "left", leftMin: 13, rightMin: 55 });
+  });
+
+  it("結論カード: 差が小さめなら「ややおすすめ」と示す", () => {
+    const r = {
+      route: { startTime: "2026-11-25T14:00:00+09:00", endTime: "2026-11-25T14:55:00+09:00", durationSec: 3300 },
+      exposure: { outdoorMin: 0, sunUpOutdoorMin: 0, potentialSunMin: 0, shadedMin: 0, unknownShadeMin: 0 },
+      vehicleSides: [side({ shadierSide: "left", slightDifference: true, leftMin: 13, rightMin: 25, frontOrBackMin: 13, totalMin: 51 })],
+      heatWarnings: [],
+    } as unknown as EvaluatedRoute;
+    render(<AnswerCard r={r} label="おすすめのルート" />);
+    expect(screen.getByText("左側の席がややおすすめ（差は小さめ）")).toBeInTheDocument();
+    expect(screen.getByText(/日差しがやや少ない側です（左右の差は小さめ）/)).toBeInTheDocument();
+    expect(screen.getByText("反対の右側は 約25分 日が当たります")).toBeInTheDocument();
+  });
+
   it("日差しの割合: 左・右・前後真上・日没後の4つで合計100%（名古屋→京都の例）、地下鉄区間は含めない", () => {
     expect(percentParts([38, 20, 19, 37])).toEqual([33, 18, 17, 32]);
     expect(percentParts([1, 1, 1]).reduce((a, b) => a + b, 0)).toBe(100);
@@ -292,6 +316,7 @@ describe("ひと目でわかる結論", () => {
     } as unknown as EvaluatedRoute;
     render(<AnswerCard r={r} label="おすすめのルート" />);
     expect(screen.getByText("右側の席がおすすめ")).toBeInTheDocument();
+    expect(screen.getByText(/🌿 日差しが少ない側です$/)).toBeInTheDocument();
     expect(screen.getByText("反対の左側は 約30分 日が当たります")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /座席の図/ })).toBeInTheDocument();
   });
