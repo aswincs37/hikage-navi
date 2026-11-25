@@ -2,6 +2,7 @@
 
 import type { EvaluatedRoute, VehicleSideExposure } from "@/lib/domain/types";
 import { useI18n } from "@/lib/i18n/client";
+import { reconcileSideWithMinutes } from "@/lib/solar/side";
 import { HeatWarnings } from "./Badges";
 
 export type SeatVerdict =
@@ -20,14 +21,15 @@ export function seatVerdict(sides: VehicleSideExposure[]): SeatVerdict {
   const rightMin = known.reduce((a, s) => a + s.rightMin, 0);
   if (leftMin + rightMin === 0) return { kind: "no_sun" };
   const decided = new Set(known.map((s) => s.shadierSide).filter((x) => x === "left" || x === "right"));
-  if (decided.size === 0) return { kind: "similar", leftMin, rightMin };
   if (decided.size > 1) {
     const [less, more] = leftMin < rightMin ? (["left", rightMin] as const) : (["right", leftMin] as const);
     const lessMin = Math.min(leftMin, rightMin);
     if (more >= lessMin * 2 && more - lessMin >= 5) return { kind: less, leftMin, rightMin, changes: true };
     return { kind: "mixed" };
   }
-  return { kind: [...decided][0] as "left" | "right", leftMin, rightMin };
+  // 区間ごとの結論を合計しても、表示する左右の分数と食い違わないようにする
+  const kind = decided.size === 0 ? "similar" : ([...decided][0] as "left" | "right");
+  return { kind: reconcileSideWithMinutes(kind, leftMin, rightMin), leftMin, rightMin };
 }
 
 /** 上から見た車両の図。おすすめの側を緑（🌿・「おすすめ」）、日が当たる側を橙（☀）で示す */

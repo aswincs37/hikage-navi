@@ -256,6 +256,15 @@ describe("ひと目でわかる結論", () => {
     expect(seatVerdict([side({ shadierSide: "similar", leftMin: 5, rightMin: 6 })]).kind).toBe("similar");
   });
 
+  it("座席の結論は、表示する左右の分数と食い違わない", () => {
+    // 大阪駅→関西空港 14:00 の実例: 左13分・右25分なのに「差は小さい」とは言わない
+    expect(seatVerdict([side({ shadierSide: "similar", leftMin: 13, rightMin: 25 })]).kind).toBe("left");
+    // 区間ごとには「差は小さい」でも、合計ではっきり差があればその側
+    expect(seatVerdict([side({ shadierSide: "similar", leftMin: 4, rightMin: 8 }), side({ legIndex: 1, shadierSide: "similar", leftMin: 4, rightMin: 8 })]).kind).toBe("left");
+    // 日差しの多い側はすすめない
+    expect(seatVerdict([side({ shadierSide: "left", leftMin: 12, rightMin: 10 }), side({ legIndex: 1, shadierSide: "similar", leftMin: 3, rightMin: 3 })]).kind).toBe("similar");
+  });
+
   it("日差しの割合: 左・右・前後真上・日没後の4つで合計100%（名古屋→京都の例）、地下鉄区間は含めない", () => {
     expect(percentParts([38, 20, 19, 37])).toEqual([33, 18, 17, 32]);
     expect(percentParts([1, 1, 1]).reduce((a, b) => a + b, 0)).toBe(100);

@@ -1,4 +1,4 @@
-import { sideWeight, vehicleSunSide } from "./side";
+import { reconcileSideWithMinutes, sideWeight, vehicleSunSide } from "./side";
 import type {
   CalculationMetadata,
   ExposureSummary,
@@ -231,11 +231,15 @@ export function vehicleSideExposure(segments: SegmentEstimate[], route: RouteAlt
     else if (weighted < MIN_WEIGHTED_SIDE_SEC) shadierSide = "similar";
     else if (Math.abs(leftW - rightW) < weighted * SIMILAR_RATIO) shadierSide = "similar";
     else shadierSide = leftW < rightW ? "left" : "right";
+    const leftMin = toMin(left);
+    const rightMin = toMin(right);
+    // 結論は、利用者に表示する左右の分数と矛盾させない
+    shadierSide = reconcileSideWithMinutes(shadierSide, leftMin, rightMin);
 
     result.push({
       legIndex,
-      leftMin: toMin(left),
-      rightMin: toMin(right),
+      leftMin,
+      rightMin,
       frontOrBackMin: toMin(frontBack),
       lowSunMin: toMin(low),
       nightMin: toMin(night),
