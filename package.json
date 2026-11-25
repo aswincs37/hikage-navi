@@ -17,7 +17,7 @@
     "rail:build": "node scripts/build-rail-network.mjs"
   },
   "engines": {
-    "node": ">=20.9"
+    "node": "22.x"
   },
   "dependencies": {
     "astronomy-engine": "^2.1.19",

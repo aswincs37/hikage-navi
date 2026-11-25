@@ -8,7 +8,7 @@ npm ci
 npm run build        # runs scripts/copy-maplibre-worker.mjs first
 npm start            # PORT env var or -p
 ```
-Serve over HTTPS behind the platform or a reverse proxy. Node 20.9+ (CI uses 22).
+Serve over HTTPS behind the platform or a reverse proxy. Node 22.x (pinned in `package.json` `engines`; set the same version in the Vercel project settings).
 
 ## Settings (set as environment variables; see `.env.example`)
 
