@@ -44,12 +44,23 @@ export type ValidationIssue = { field: string; code: string };
 
 export type Validated<T> = { ok: true; value: T } | { ok: false; issues: ValidationIssue[] };
 
+/**
+ * Zod の検証エラーを API の issues に変換する。
+ * Zod v4 のコードは invalid_type・invalid_value のように既に invalid_ で始まるものがあるため、二重に付けない。
+ */
+export function toValidationIssues(issues: readonly { path: PropertyKey[]; code: string }[], emptyField = "body"): ValidationIssue[] {
+  return issues.map((i) => ({
+    field: i.path.map(String).join(".") || emptyField,
+    code: i.code.startsWith("invalid_") ? i.code : `invalid_${i.code}`,
+  }));
+}
+
 export function validateJourneyRequest(input: unknown, now: Date = new Date()): Validated<JourneyRequest> {
   const parsed = journeyRequestSchema.safeParse(input);
   if (!parsed.success) {
     return {
       ok: false,
-      issues: parsed.error.issues.map((i) => ({ field: i.path.join(".") || "body", code: `invalid_${i.code}` })),
+      issues: toValidationIssues(parsed.error.issues),
     };
   }
   const v = parsed.data;

@@ -189,6 +189,15 @@ describe("入力検証", () => {
     if (!v.ok) expect(v.issues.map((i) => i.field)).toContain(field);
   });
 
+  it("エラーコードの invalid_ を二重に付けない", () => {
+    const v = validateJourneyRequest({}, NOW);
+    expect(v.ok).toBe(false);
+    if (!v.ok) {
+      expect(v.issues).toContainEqual({ field: "origin", code: "invalid_type" });
+      expect(v.issues.every((i) => !i.code.startsWith("invalid_invalid_"))).toBe(true);
+    }
+  });
+
   it("比較する出発時刻", () => {
     expect(validateDepartureTimes(undefined)).toMatchObject({ ok: true });
     expect(validateDepartureTimes(["13:00", "09:00", "09:00"])).toEqual({ ok: true, value: ["09:00", "13:00"] });
