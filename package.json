@@ -11,8 +11,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
+    "test": "node scripts/vitest.mjs run",
+    "test:watch": "node scripts/vitest.mjs",
     "check": "npm run typecheck && npm run lint && npm test && npm run build",
     "rail:build": "node scripts/build-rail-network.mjs"
   },
