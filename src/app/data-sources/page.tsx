@@ -5,7 +5,7 @@ import { getI18n } from "@/lib/i18n/server";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { m } = await getI18n();
-  return { title: m.nav.dataSources };
+  return { title: m.nav.dataSources, alternates: { canonical: "/data-sources" } };
 }
 
 interface Row {

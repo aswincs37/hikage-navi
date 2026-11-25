@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { JourneyForm } from "@/components/JourneyForm";
 import { fromQuery } from "@/lib/journey/query";
 import { getConfig } from "@/lib/config/env";
 import { getI18n } from "@/lib/i18n/server";
+import { homeStructuredData, toJsonLd } from "@/lib/seo/structured-data";
+
+/** ?from=…&to=… 付きの URL もトップページとして扱う */
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 export default async function HomePage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const sp = await searchParams;
@@ -31,6 +36,8 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
 
   return (
     <div className="space-y-6 sm:space-y-8">
+      {/* 検索エンジン向けのサイト情報（JSON-LD） */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: toJsonLd(homeStructuredData()) }} />
       {/* 見出し（短く。すぐ下に検索フォーム） */}
       <section aria-labelledby="intro">
         <h1 id="intro" className="text-xl font-bold leading-snug text-ink sm:text-2xl">
