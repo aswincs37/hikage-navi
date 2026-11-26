@@ -173,7 +173,7 @@ export function RouteDetails() {
 
       <HeatWarnings warnings={r.heatWarnings} />
       {why && (
-        <div className="rounded-lg border-l-4 border-shade bg-shade-bg p-3 text-sm">
+        <div className="rounded-lg bg-shade-bg p-3 text-sm">
           <p className="leading-relaxed text-ink">{why}</p>
         </div>
       )}

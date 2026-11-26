@@ -82,10 +82,10 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
       {/* 誠実性とプライバシー */}
       <section className="grid gap-3 md:grid-cols-2">
         {[
-          { tag: m.home.honestyTag, title: m.home.honestyTitle, body: m.home.honestyBody, href: "/how-it-works", link: m.nav.howItWorks, color: "border-l-ai" },
-          { tag: m.home.privacyTag, title: m.home.privacyTitle, body: m.home.privacyBody, href: "/privacy", link: m.nav.privacy, color: "border-l-shade" },
+          { tag: m.home.honestyTag, title: m.home.honestyTitle, body: m.home.honestyBody, href: "/how-it-works", link: m.nav.howItWorks },
+          { tag: m.home.privacyTag, title: m.home.privacyTitle, body: m.home.privacyBody, href: "/privacy", link: m.nav.privacy },
         ].map((c) => (
-          <div key={c.href} className={`rounded-xl border border-l-4 border-line bg-surface p-4 ${c.color}`}>
+          <div key={c.href} className="rounded-xl border border-line bg-surface p-4">
             <div className="flex flex-wrap items-center gap-2">
               <span className="rounded bg-surface-2 px-1.5 py-0.5 text-[11px] font-bold text-muted">{c.tag}</span>
               <h2 className="text-sm font-bold text-ink">{c.title}</h2>

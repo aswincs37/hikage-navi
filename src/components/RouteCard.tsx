@@ -295,7 +295,7 @@ export function RouteCard({ r, ranked, routeCount, selected, onSelect, detailsHr
         <WeatherLine w={r.weather} />
 
         {why && (
-          <p className="rounded-md border-l-4 border-shade bg-shade-bg px-3 py-2 text-xs leading-relaxed text-ink">{why}</p>
+          <p className="rounded-md bg-shade-bg px-3 py-2 text-xs leading-relaxed text-ink">{why}</p>
         )}
       </div>
 
