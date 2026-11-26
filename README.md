@@ -1,5 +1,7 @@
 # ひかげナビ (Hikage Navi)
 
+**Live site: [https://www.hikage-navi.online](https://www.hikage-navi.online)**
+
 A Japanese-first, mobile-first web app for comparing journeys in Japan by **outdoor time, potential direct sunlight, estimated shade, weather, UV and official heat-index (WBGT) forecasts**.
 
 The core rule: measured, forecast, calculated, and unknown values are always kept apart and labelled. Missing data stays missing. Nothing is fabricated, including timetables, weather, building heights, and shade.
